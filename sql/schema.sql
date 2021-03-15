@@ -47,7 +47,7 @@ CREATE TABLE IF NOT EXISTS episode(
 CREATE TABLE IF NOT EXISTS users (
 	username varchar(32) not null unique,
 	email varchar(64) not null unique,
-  password varchar(64) not null,
+    password varchar(64) not null,
 	admin boolean default false 
 );
 
@@ -58,3 +58,4 @@ CREATE TABLE IF NOT EXISTS userConnect (
 	status varchar(64),
 	rating int
 );
+
