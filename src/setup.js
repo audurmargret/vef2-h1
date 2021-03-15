@@ -63,7 +63,11 @@ async function main() {
   // bæta færslum við töflu
   try {
     const hashedPW = await bcrypt.hash('123', 11);
+    const hashedPW = await bcrypt.hash('321', 11);
     await query('INSERT INTO users (username, email, password, admin) VALUES ($1, $2);', ['admin', 'abc@abc.com', hashedPW, true]);
+    await query('INSERT INTO users (username, email, password, admin) VALUES ($1, $2);', ['notandi', 'cba@abc.com', hashedPW2, false]);
+
+    // TODO: Bæta við gögnum úr data möppunni
 
     console.info('Gögnum bætt við');
   } catch (e) {
