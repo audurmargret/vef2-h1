@@ -4,8 +4,8 @@ import {
     updateSeriesRating,
     deleteSeriesRating,
     stateSeries,
-    updateStateSeries,
-    deleteStateSeries,
+    updateSeriesState,
+    deleteSeriesState,
     deleteSeries,
     updateSeries,
     findSeries
@@ -119,7 +119,7 @@ router.patch('/:seriesId/state', (req, res) => {
     const {
         seriesId
     } = req.params;
-    const success = updateStateSeries(seriesId);
+    const success = updateSeriesState(seriesId);
     res.json({success});
 })
 
@@ -131,7 +131,7 @@ router.delete('/:seriesId/state', (req, res) => {
     const {
         seriesId
     } = req.params;
-    const success = deleteStateSeries(seriesId);
+    const success = deleteSeriesState(seriesId);
     res.json({success});
 })
 

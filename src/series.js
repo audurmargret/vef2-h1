@@ -29,10 +29,10 @@ export function stateSeries(id) {
     return true;
 }
 
-export function updateStateSeries(id) {
+export function updateSeriesState(id) {
     return true;
 }
 
-export function deleteStateSeries(id) {
+export function deleteSeriesState(id) {
     return false;
 }
