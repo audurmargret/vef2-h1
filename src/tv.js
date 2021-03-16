@@ -1,5 +1,22 @@
 import express from 'express';
-import { findSeriesById } from './series.js';
+import { 
+    rateSeries,
+    updateSeriesRating,
+    deleteSeriesRating,
+    stateSeries,
+    updateStateSeries,
+    deleteStateSeries,
+    deleteSeries,
+    updateSeries,
+    findSeries
+} from './series.js';
+import { 
+    allSeasons, 
+    addSeason, 
+    findSeason, 
+    deleteSeason 
+} from './seasons.js';
+import { addEpisode, findEpisode, deleteEpisode } from './episodes.js';
 export const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -14,169 +31,185 @@ router.post('/', (req, res) => {
     res.json({ msg: 'Bætti við þátt'});
 })
 
-router.get('/:showId', (req, res) => {
+router.get('/:seriesId', (req, res) => {
     const {
-        showId
+        seriesId
     } = req.params;
-    const show = findSeriesById(showId);
-    res.json(show);
+    const series = findSeries(seriesId);
+    res.json(series);
 })
 
-router.patch('/:showId', (req, res) => {
+router.patch('/:seriesId', (req, res) => {
     if (!req.user.admin) {
         res.status(401).json({ error: 'Villa við að uppfæra sjónvarpsþátt' });
         return;
     }
     const {
-        showId
+        seriesId
     } = req.params;
-    res.json({showId});
+    const success = updateSeries(seriesId);
+    res.json({success});
 })
 
-router.delete('/:showId', (req, res) => {
-    if (!!req.user.admin) {
+router.delete('/:seriesId', (req, res) => {
+    if (!req.user.admin) {
         res.status(401).json({ error: 'Villa við að eyða sjónvarpsþátt' });
         return;
     }
     const {
-        showId
+        seriesId
     } = req.params;
-    res.json({showId});
+    const success = deleteSeries(seriesId);
+    res.json({success});
 })
 
-router.post('/:showId/rate', (req, res) => {
+router.post('/:seriesId/rate', (req, res) => {
     if (!req.isAuthenticated()) {
         res.status(401).json({ error: 'Villa við gefa einkunn' });
         return;
     }
     const {
-        showId
+        seriesId
     } = req.params;
-    res.json({showId});
+    const success = rateSeries(seriesId);
+    res.json({success});
 })
 
-router.patch('/:showId/rate', (req, res) => {
+router.patch('/:seriesId/rate', (req, res) => {
     if (!req.isAuthenticated()) {
         res.status(401).json({ error: 'Villa við að uppfæra einkunn' });
         return;
     }
     const {
-        showId
+        seriesId
     } = req.params;
-    res.json({showId});
+    const success = updateSeriesRating(seriesId);
+    res.json({success});
 })
 
-router.delete('/:showId/rate', (req, res) => {
+router.delete('/:seriesId/rate', (req, res) => {
     if (!req.isAuthenticated()) {
         res.status(401).json({ error: 'Villa við að eyða einkunn' });
         return;
     }
     const {
-        showId
+        seriesId
     } = req.params;
-    res.json({showId});
+    const success = deleteSeriesRating(seriesId);
+    res.json({success});
 })
 
-router.post('/:showId/state', (req, res) => {
+router.post('/:seriesId/state', (req, res) => {
     if (!req.isAuthenticated()) {
         res.status(401).json({ error: 'Villa við að skrá stöðu' });
         return;
     }
     const {
-        showId
+        seriesId
     } = req.params;
-    res.json({showId});
+    const success = stateSeries(seriesId);
+    res.json({success});
 })
 
-router.patch('/:showId/state', (req, res) => {
+router.patch('/:seriesId/state', (req, res) => {
     if (!req.isAuthenticated()) {
         res.status(401).json({ error: 'Villa við að uppfæra stöðu' });
         return;
     }
     const {
-        showId
+        seriesId
     } = req.params;
-    res.json({showId});
+    const success = updateStateSeries(seriesId);
+    res.json({success});
 })
 
-router.delete('/:showId/state', (req, res) => {
+router.delete('/:seriesId/state', (req, res) => {
     if (!req.isAuthenticated()) {
         res.status(401).json({ error: 'Villa við að eyða stöðu' });
         return;
     }
     const {
-        showId
+        seriesId
     } = req.params;
-    res.json({showId});
+    const success = deleteStateSeries(seriesId);
+    res.json({success});
 })
 
-router.get('/:showId/season', (req, res) => {
+router.get('/:seriesId/season', (req, res) => {
     const {
-        showId
+        seriesId
     } = req.params;
-    res.json({ showId });
+    const seasons = allSeasons(seriesId);
+    res.json(seasons);
 })
 
-router.post('/:showId/season', (req, res) => {
+router.post('/:seriesId/season', (req, res) => {
     if (!req.user.admin) {
         res.status(401).json({ error: 'Villa við að eyða seríu' });
         return;
     }
     const {
-        showId
+        seriesId
     } = req.params;
-    res.json({ showId });
+    const success = addSeason(seriesId);
+    res.json({ success });
 })
 
-router.get('/:showId/season/:seasonId', (req, res) => {
+router.get('/:seriesId/season/:seasonId', (req, res) => {
     const {
-        showId,
+        seriesId,
         seasonId
     } = req.params;
-    res.json({ showId, seasonId });
+    const season = findSeason(seriesId, seasonId);
+    res.json(season);
 })
 
-router.delete('/:showId/season/:seasonId', (req, res) => {
+router.delete('/:seriesId/season/:seasonId', (req, res) => {
     if (!req.user.admin) {
         res.status(401).json({ error: 'Villa við að eyða seríu' });
         return;
     }
     const {
-        showId,
+        seriesId,
         seasonId
     } = req.params;
-    res.json({ msg: 'DELETE' });
+    const success = deleteSeason(seriesId, seasonId);
+    res.json({ success });
 })
 
-router.post('/:showId/season/:seasonId/episode', (req, res) => {
+router.post('/:seriesId/season/:seasonId/episode', (req, res) => {
     if (!req.user.admin) {
         res.status(401).json({ error: 'Villa við að búa til nýjan þátt' });
         return;
     }
     const {
-        showId,
+        seriesId,
         seasonId
     } = req.params;
+    const success = addEpisode(seriesId, seasonId);
+    res.json( { success } );
 })
 
-router.get('/:showId/season/:seasonId/episode/:episodeId', (req, res) => {
+router.get('/:seriesId/season/:seasonId/episode/:episodeId', (req, res) => {
     const {
-        showId,
+        seriesId,
         seasonId,
         episodeId
     } = req.params;
-    res.json( { showId, seasonId, episodeId } );
+    const episode = findEpisode(seriesId, seasonId, episodeId);
+    res.json(episode);
 })
 
-router.delete('/:showId/season/:seasonId/episode/:episodeId', (req, res) => {
+router.delete('/:seriesId/season/:seasonId/episode/:episodeId', (req, res) => {
     if (!req.user.admin) {
         res.status(401).json({ error: 'Villa við að eyða þætti' });
         return;
     }
     const {
-        showId,
+        seriesId,
         seasonId,
         episodeId
     } = req.params;
-    res.json({ msg: 'DELETE' });
+    const success = deleteEpisode(seriesId, seasonId, episodeId);
+    res.json( { success } );
 })
