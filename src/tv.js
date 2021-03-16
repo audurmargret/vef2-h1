@@ -25,7 +25,7 @@ router.get('/', (req, res) => {
 
 router.post('/', (req, res) => {
     if (!req.user.admin) {
-        res.json({ error: 'Villa við að búa til sjónvarpsþátt' });
+        res.json({ error: 'Villa við að búa til nýtt series' });
         return;
     }
     res.json({ msg: 'Bætti við þátt'});
@@ -41,7 +41,7 @@ router.get('/:seriesId', (req, res) => {
 
 router.patch('/:seriesId', (req, res) => {
     if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að uppfæra sjónvarpsþátt' });
+        res.status(401).json({ error: 'Villa við að uppfæra serie' });
         return;
     }
     const {
@@ -53,7 +53,7 @@ router.patch('/:seriesId', (req, res) => {
 
 router.delete('/:seriesId', (req, res) => {
     if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að eyða sjónvarpsþátt' });
+        res.status(401).json({ error: 'Villa við að eyða serie' });
         return;
     }
     const {
@@ -145,7 +145,7 @@ router.get('/:seriesId/season', (req, res) => {
 
 router.post('/:seriesId/season', (req, res) => {
     if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að eyða seríu' });
+        res.status(401).json({ error: 'Villa við að bæta við season' });
         return;
     }
     const {
@@ -166,7 +166,7 @@ router.get('/:seriesId/season/:seasonId', (req, res) => {
 
 router.delete('/:seriesId/season/:seasonId', (req, res) => {
     if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að eyða seríu' });
+        res.status(401).json({ error: 'Villa við að eyða season' });
         return;
     }
     const {
@@ -179,7 +179,7 @@ router.delete('/:seriesId/season/:seasonId', (req, res) => {
 
 router.post('/:seriesId/season/:seasonId/episode', (req, res) => {
     if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að búa til nýjan þátt' });
+        res.status(401).json({ error: 'Villa við að búa til nýjan episode' });
         return;
     }
     const {
@@ -202,7 +202,7 @@ router.get('/:seriesId/season/:seasonId/episode/:episodeId', (req, res) => {
 
 router.delete('/:seriesId/season/:seasonId/episode/:episodeId', (req, res) => {
     if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að eyða þætti' });
+        res.status(401).json({ error: 'Villa við að eyða episode' });
         return;
     }
     const {
