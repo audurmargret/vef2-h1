@@ -1,8 +1,26 @@
 import passport from 'passport';
 import { Strategy } from 'passport-local';
+import jwt from 'jsonwebtoken';
+import {
+    Strategy as StrategyJWT, ExtractJwt,
+  } from 'passport-jwt';
+import { comparePasswords, findByUsername, findById } from './users.js';
 
-// import { comparePasswords, findByUsername, findById } from './users.js';
-import { comparePasswords, findByUsername } from './users.js';
+export const tokenLifeTime = 60 * 60 * 24 * 7; // 7 dagar
+
+const {
+    JWT_SECRET: jwtSecret,
+} = process.env;
+
+if (!jwtSecret) {
+    console.error('Vantar .env gildi');
+    process.exit(1);
+}
+
+export const jwtOptions = {
+    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    secretOrKey: jwtSecret,
+  };
 
 /**
  * Athugar hvort username og password sé til í notandakerfi.
@@ -31,8 +49,9 @@ async function strat(username, password, done) {
   }
 }
 
+
 // Notum local strategy með „strattinu“ okkar til að leita að notanda
-passport.use(new Strategy(strat));
+passport.use(new Strategy(jwtOptions, strat));
 
 // getum stillt með því að senda options hlut með
 // passport.use(new Strategy({ usernameField: 'email' }, strat));
@@ -54,12 +73,44 @@ passport.deserializeUser(async (username, done) => {
 
 // Hjálpar middleware sem athugar hvort notandi sé innskráður og hleypir okkur
 // þá áfram, annars sendir á /login
-export function ensureLoggedIn(req, res, next) {
+function ensureLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
 
-  return res.redirect('/admin/login');
+  return res.redirect('/users/login');
+}
+
+export function requireAuthentication(req, res, next) {
+  console.log("require")
+  return passport.authenticate(
+    'jwt',
+    { session: false },
+    (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
+
+      if (!user) {
+        const error = info.name === 'TokenExpiredError'
+          ? 'expired token' : 'invalid token';
+
+        return res.status(401).json({ error });
+      }
+      // Látum notanda vera aðgengilegan í rest af middlewares
+      req.user = user;
+      return next();
+    },
+  )(req, res, next);
+}
+
+  
+export function checkUserIsAdmin(req, res, next) {
+  if (req.user && req.user.admin) {
+    return next();
+  }
+
+  return res.status(403).json({ error: 'Forbidden' });
 }
 
 export default passport;

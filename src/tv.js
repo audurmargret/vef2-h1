@@ -1,5 +1,5 @@
 import express from 'express';
-import { findSeriesById } from './series.js/index.js';
+import { findSeriesById } from './series.js';
 export const router = express.Router();
 
 router.get('/', (req, res) => {
