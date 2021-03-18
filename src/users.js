@@ -11,14 +11,24 @@ export async function comparePasswords(password, hash) {
   return false;
 }
 
+export async function findAll() {
+  const q = 'SELECT * FROM users;';
+  try {
+    const result = await query(q);
+    return result.rows;
+  } catch (e) {
+    console.error('Gat ekki fundið alla notendur');
+    return null;
+  }
+}
 export async function findByUsername(username) {
   const q = `SELECT * FROM users WHERE username = $1`;
-  //console.log('allir: ', await query('SELECT * FROM users;'));
   try {
     const result = await query(q, [username]);
-    if (result.length === 1) {
+    console.log(result.rowCount)
+    if (result.rowCount === 1) {
       
-      return result[0];
+      return result.rows[0];
 
     }
   } catch (e) {
@@ -30,12 +40,13 @@ export async function findByUsername(username) {
 }
 
 export async function findById(id) {
-  const q = 'SELECT * FROM users WHERE id = $1';
+  const q = `SELECT * FROM users WHERE id = $1`;
 
   try {
     const result = await query(q, [id]);
-    if (result.length === 1) {
-      return result[0];
+    console.log("ID", result)
+    if (result.rowCount === 1) {
+      return result.rows[0];
     }
   } catch (e) {
     console.error('Gat ekki fundið notanda eftir id');
