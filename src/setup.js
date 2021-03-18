@@ -4,7 +4,7 @@ import util from 'util';
 import pg from 'pg';
 import bcrypt from 'bcrypt';
 import csv from 'csv-parser';
-import { createEpisodes, createSeasons, createSeries } from './db.js';
+import { createEpisodes, createGenre, createSeasons, createSeries } from './db.js';
 
 dotenv.config();
 
@@ -45,6 +45,7 @@ async function insertSeries(file) {
   .pipe(csv())
   .on('data', async (row) => {
     await createSeries(row);
+    await createGenre(row);
   })
   .on('end', () => {
     console.log('series.csv importað');

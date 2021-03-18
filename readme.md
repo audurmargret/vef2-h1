@@ -10,6 +10,10 @@
 * Nöfn og notendanöfn allra í hóp
 
 
+## Uppsetning
+# Afrita skal þessa skrá í .env og setja rétta slóð á gagnagrunn
+# DATABASE_URL=postgres://<USER>:<PASS>@localhost/<DATABASENAME>
+
 ## Notendur
 ### Admin notandi
 * notendanafn: admin

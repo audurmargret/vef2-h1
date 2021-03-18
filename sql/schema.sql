@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS TVseries(
 
 CREATE TABLE IF NOT EXISTS TVgenre(
   id serial primary key,
-  typeName varchar(128) not null
+  typeName varchar(128) not null unique
 );
 
 CREATE TABLE IF NOT EXISTS TVconnect(

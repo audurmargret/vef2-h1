@@ -96,7 +96,23 @@ export async function createSeries(data){
 }
 
 export async function createGenre(data){
-    //TODO
+    const q = `
+        INSERT INTO
+          TVgenre (
+            typeName)
+          VALUES ($1) ON CONFLICT (typeName)
+          DO NOTHING;
+    `;
+    const genres = data.genres.split(',');
+        try {
+            for (let i = 0; i < genres.length; i++){
+                await query(q, [
+                    genres[i]
+                ]);
+            }
+        } catch(e) {
+            console.info('Villa við að setja inn genre', e);
+        }
 }
 
 export async function createSeasons(data) {
