@@ -52,8 +52,10 @@ async function main() {
 
   // búa til töflu út frá skema
   try {
-    const createTable = await readFileAsync('./sql/schema.sql');
-    await query(createTable.toString('utf8'));
+    // const createTable = await readFileAsync('./sql/schema.sql');
+    // await query(createTable.toString('utf8'));
+    const string = 'CREATE TABLE IF NOT EXISTS users (id serial primary key, username varchar(32) not null unique, email varchar(64) not null unique, password varchar(64) not null, admin boolean default false);'
+    await query(string)
     console.info('Tafla búin til');
   } catch (e) {
     console.error('Villa við að búa til töflu:', e.message);
@@ -63,9 +65,9 @@ async function main() {
   // bæta færslum við töflu
   try {
     const hashedPW = await bcrypt.hash('123', 11);
-    const hashedPW = await bcrypt.hash('321', 11);
-    await query('INSERT INTO users (username, email, password, admin) VALUES ($1, $2);', ['admin', 'abc@abc.com', hashedPW, true]);
-    await query('INSERT INTO users (username, email, password, admin) VALUES ($1, $2);', ['notandi', 'cba@abc.com', hashedPW2, false]);
+    const hashedPW2 = await bcrypt.hash('321', 11);
+    await query('INSERT INTO users (username, email, password, admin) VALUES ($1, $2, $3, $4);', ['admin', 'abc@abc.com', hashedPW, true]);
+    await query('INSERT INTO users (username, email, password, admin) VALUES ($1, $2, $3, $4);', ['notandi', 'cba@abc.com', hashedPW2, false]);
 
     // TODO: Bæta við gögnum úr data möppunni
 

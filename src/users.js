@@ -12,13 +12,14 @@ export async function comparePasswords(password, hash) {
 }
 
 export async function findByUsername(username) {
-  const q = 'SELECT * FROM users WHERE username = $1';
-
+  const q = `SELECT * FROM users WHERE username = $1`;
+  //console.log('allir: ', await query('SELECT * FROM users;'));
   try {
     const result = await query(q, [username]);
+    if (result.length === 1) {
+      
+      return result[0];
 
-    if (result.rowCount === 1) {
-      return result.rows[0];
     }
   } catch (e) {
     console.error('Gat ekki fundið notanda eftir notendanafni');
@@ -27,22 +28,36 @@ export async function findByUsername(username) {
 
   return false;
 }
-/*
+
 export async function findById(id) {
   const q = 'SELECT * FROM users WHERE id = $1';
 
   try {
     const result = await query(q, [id]);
-
-    if (result.rowCount === 1) {
-      return result.rows[0];
+    if (result.length === 1) {
+      return result[0];
     }
   } catch (e) {
     console.error('Gat ekki fundið notanda eftir id');
   }
 
   return null;
-}*/
+}
+
+export async function updateAdmin(userID) {
+  const user = await findById(userID);
+  user.admin = !user.admin;
+  const q = `UPDATE users SET admin = $1 WHERE id = $2`;
+  const values = [user.admin, userID];
+  try {
+    const result = await query(q, values);
+    return true;
+  } catch(e) {
+    console.error('Gat ekki uppfært admin réttindi');
+  }
+
+  return false;
+}
 
 export async function createUser(username, email, password, admin) {
   // Geymum hashað password!
@@ -51,7 +66,7 @@ export async function createUser(username, email, password, admin) {
   const q = `
     INSERT INTO
       users (username, email, password, admin)
-    VALUES ($1, $2)
+    VALUES ($1, $2, $3, $4)
     RETURNING *
   `;
 
