@@ -1,50 +1,53 @@
-CREATE TABLE IF NOT EXISTS TVshows(
-  id primary key,
+CREATE TABLE IF NOT EXISTS TVseries(
+  id serial primary key,
   showName varchar(128) not null,
   releaseDate date,
-  stillGoing boolean not null,
+  stillGoing boolean,
   tagline varchar(128),
   photo varchar(128),
-  about varchar(400),
+  about text,
   language varchar(128),
   channel varchar(128),
   url varchar(128)
 );
 
-CREATE TABLE IF NOT EXISTS TVshowType(
-  id primary key,
-  typeName varchar(128) not null
+CREATE TABLE IF NOT EXISTS TVgenre(
+  id serial primary key,
+  typeName varchar(128) not null unique
 );
 
 CREATE TABLE IF NOT EXISTS TVconnect(
-  id primary key,
-  showName varchar(128) not null,
-  typeName varchar(128) not null,
-  foreign key (showName) references TVshows (showName),
-  foreign key (typeName) references TVshowType (typeName),
+  id serial primary key,
+  tvseries_id integer,
+  tvgenre_id integer,
+  foreign key (tvseries_id) references TVseries (id) on delete cascade,
+  foreign key (tvgenre_id) references TVgenre (id) on delete cascade
 );
 
-CREATE TABLE IF NOT EXISTS TVseason(
-	id primary key,
+CREATE TABLE IF NOT EXISTS TVseasons(
+	id serial primary key,
 	showName varchar(128) not null,
-	number int default 1,
-	realeaseDate date,
-	about varchar(400),
+	season_num integer,
+	releaseDate date,
+	about text,
 	photo varchar(128),
-	foreign key (showName, releaseDate, about, photo) references TVshows(showName, releaseDate, about, photo)
+	series_id integer,
+	foreign key (series_id) references TVseries(id) on delete cascade
 );
 
-CREATE TABLE IF NOT EXISTS episode(
-	id primary key,
-	showName varchar(128) not null,
+CREATE TABLE IF NOT EXISTS episodes(
+	id serial primary key,
 	episodeName varchar(128) not null,
-	number int default 1,
-	realeaseDate date,
-	about varchar(400),
-	foreign key (showName, realeaseDate, about) references TVseason(showName, about, realeaseDate)
+	epi_num integer,
+	releaseDate date,
+	about text,
+	season integer,
+	series_id integer,
+	foreign key (series_id) references TVseries(id)
 );
 
 CREATE TABLE IF NOT EXISTS users (
+	id serial primary key,
 	username varchar(32) not null unique,
 	email varchar(64) not null unique,
     password varchar(64) not null,
@@ -52,10 +55,12 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 CREATE TABLE IF NOT EXISTS userConnect (
-	showName varchar(128) not null,
-	episodeName varchar(128) not null,
-	username varchar(32) not null unique,
+	id serial primary key,
+	episode_id integer,
+	user_id integer,
 	status varchar(64),
-	rating int
+	rating integer,
+	foreign key (episode_id) references episodes(id) on delete cascade,
+	foreign key (user_id) references users(id) on delete cascade
 );
 

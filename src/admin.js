@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 import { query } from './db.js';
 import passport, { requireAuthentication, checkUserIsAdmin, jwtOptions, tokenLifeTime } from './login.js';
-import { comparePasswords, findById, findByUsername, updateAdmin, createUser } from './users.js';
+import { comparePasswords, findById, findByUsername, updateAdmin, createUser, findAll } from './users.js';
 import { catchErrors, pagingInfo, PAGE_SIZE } from './utils.js';
 
 export const router = express.Router();
@@ -19,7 +19,7 @@ router.use(express.json());
 async function index(req, res) {
     // TODO:  paging
     const string = 'SELECT * FROM users;';
-    const userList = await query(string);
+    const userList = await findAll();
     return res.json({userList});
 }
 

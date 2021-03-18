@@ -3,6 +3,8 @@ import fs from 'fs';
 import util from 'util';
 import pg from 'pg';
 import bcrypt from 'bcrypt';
+import csv from 'csv-parser';
+import { createEpisodes, createGenre, createSeasons, createSeries } from './db.js';
 
 dotenv.config();
 
@@ -38,25 +40,57 @@ async function query(q, values = []) {
   }
 }
 
+async function insertSeries(file) {
+  fs.createReadStream(file)
+  .pipe(csv())
+  .on('data', async (row) => {
+    await createSeries(row);
+    await createGenre(row);
+  })
+  .on('end', () => {
+    console.log('series.csv importað');
+  })
+}
+
+async function insertSeasons(file) {
+  fs.createReadStream(file)
+  .pipe(csv())
+  .on('data', async (row) => {
+    await createSeasons(row);
+  })
+  .on('end', () => {
+    console.log('seasons.csv importað');
+  })
+}
+
+async function insertEpisodes(file) {
+  fs.createReadStream(file)
+  .pipe(csv())
+  .on('data', async (row) => {
+    await createEpisodes(row);
+  })
+  .on('end', () => {
+    console.log('episodes.csv importað');
+  })
+}
+
 async function main() {
   console.info(`Set upp gagnagrunn á ${connectionString}`);
   // droppa töflu ef til
-  await query('DROP TABLE IF EXISTS TVshows');
-  await query('DROP TABLE IF EXISTS TVshowType');
+  await query('DROP TABLE IF EXISTS TVseries cascade');
+  await query('DROP TABLE IF EXISTS TVgenre cascade');
   await query('DROP TABLE IF EXISTS TVconnect');
-  await query('DROP TABLE IF EXISTS TVseason');
-  await query('DROP TABLE IF EXISTS episode');
-  await query('DROP TABLE IF EXISTS users');
+  await query('DROP TABLE IF EXISTS TVseasons cascade');
+  await query('DROP TABLE IF EXISTS episodes cascade');
+  await query('DROP TABLE IF EXISTS users cascade');
   await query('DROP TABLE IF EXISTS usersConnect');
   console.info('Töflum eytt');
 
   // búa til töflu út frá skema
   try {
-    // const createTable = await readFileAsync('./sql/schema.sql');
-    // await query(createTable.toString('utf8'));
-    const string = 'CREATE TABLE IF NOT EXISTS users (id serial primary key, username varchar(32) not null unique, email varchar(64) not null unique, password varchar(64) not null, admin boolean default false);'
-    await query(string)
-    console.info('Tafla búin til');
+    const createTable = await readFileAsync('./sql/schema.sql');
+    await query(createTable.toString('utf8'));
+    console.info('Töflur búnar til');
   } catch (e) {
     console.error('Villa við að búa til töflu:', e.message);
     return;
@@ -70,6 +104,12 @@ async function main() {
     await query('INSERT INTO users (username, email, password, admin) VALUES ($1, $2, $3, $4);', ['notandi', 'cba@abc.com', hashedPW2, false]);
 
     // TODO: Bæta við gögnum úr data möppunni
+    
+    
+    await insertSeries('./data/series.csv');
+    await insertSeasons('./data/seasons.csv');
+    await insertEpisodes('./data/episodes.csv');
+    //console.log(csvSeasons);
 
     console.info('Gögnum bætt við');
   } catch (e) {
