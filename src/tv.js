@@ -18,17 +18,14 @@ import {
     deleteSeason 
 } from './seasons.js';
 import { addEpisode, findEpisode, deleteEpisode } from './episodes.js';
+import { checkUserIsAdmin, requireAuthentication } from './login.js';
 export const router = express.Router();
 
 router.get('/', (req, res) => {
     res.json({color: 'Bleikur'})
 });
 
-router.post('/', (req, res) => {
-    /* if (!req.user.admin) {
-        res.json({ error: 'Villa við að búa til nýtt series' });
-        return;
-    } */
+router.post('/', requireAuthentication, checkUserIsAdmin, (req, res) => {
     const success = addSeries(req.body);
     if (success) {
         res.json({ msg: 'Bætti við þáttaröð'});
@@ -45,11 +42,7 @@ router.get('/:seriesId', (req, res) => {
     res.json(series);
 })
 
-router.patch('/:seriesId', (req, res) => {
-    /* if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að uppfæra serie' });
-        return;
-    } */
+router.patch('/:seriesId', requireAuthentication, checkUserIsAdmin, (req, res) => {
     const {
         seriesId
     } = req.params;
@@ -61,11 +54,7 @@ router.patch('/:seriesId', (req, res) => {
     }
 })
 
-router.delete('/:seriesId', (req, res) => {
-    /* if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að eyða serie' });
-        return;
-    } */
+router.delete('/:seriesId', requireAuthentication, checkUserIsAdmin, (req, res) => {
     const {
         seriesId
     } = req.params;
@@ -77,11 +66,7 @@ router.delete('/:seriesId', (req, res) => {
     }
 })
 
-router.post('/:seriesId/rate', (req, res) => {
-    /* if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Villa við að gefa einkunn' });
-        return;
-    } */
+router.post('/:seriesId/rate', requireAuthentication, (req, res) => {
     const {
         seriesId
     } = req.params;
@@ -93,11 +78,7 @@ router.post('/:seriesId/rate', (req, res) => {
     }
 })
 
-router.patch('/:seriesId/rate', (req, res) => {
-    if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Villa við að uppfæra einkunn' });
-        return;
-    }
+router.patch('/:seriesId/rate', requireAuthentication, (req, res) => {
     const {
         seriesId
     } = req.params;
@@ -105,11 +86,7 @@ router.patch('/:seriesId/rate', (req, res) => {
     res.json({success});
 })
 
-router.delete('/:seriesId/rate', (req, res) => {
-    if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Villa við að eyða einkunn' });
-        return;
-    }
+router.delete('/:seriesId/rate', requireAuthentication, (req, res) => {
     const {
         seriesId
     } = req.params;
@@ -117,11 +94,7 @@ router.delete('/:seriesId/rate', (req, res) => {
     res.json({success});
 })
 
-router.post('/:seriesId/state', (req, res) => {
-    if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Villa við að skrá stöðu' });
-        return;
-    }
+router.post('/:seriesId/state', requireAuthentication, (req, res) => {
     const {
         seriesId
     } = req.params;
@@ -129,11 +102,7 @@ router.post('/:seriesId/state', (req, res) => {
     res.json({success});
 })
 
-router.patch('/:seriesId/state', (req, res) => {
-    if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Villa við að uppfæra stöðu' });
-        return;
-    }
+router.patch('/:seriesId/state', requireAuthentication, (req, res) => {
     const {
         seriesId
     } = req.params;
@@ -141,11 +110,7 @@ router.patch('/:seriesId/state', (req, res) => {
     res.json({success});
 })
 
-router.delete('/:seriesId/state', (req, res) => {
-    if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Villa við að eyða stöðu' });
-        return;
-    }
+router.delete('/:seriesId/state', requireAuthentication, (req, res) => {
     const {
         seriesId
     } = req.params;
@@ -161,11 +126,7 @@ router.get('/:seriesId/season', (req, res) => {
     res.json(seasons);
 })
 
-router.post('/:seriesId/season', (req, res) => {
-    if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að bæta við season' });
-        return;
-    }
+router.post('/:seriesId/season', requireAuthentication, checkUserIsAdmin, (req, res) => {
     const {
         seriesId
     } = req.params;
@@ -182,11 +143,7 @@ router.get('/:seriesId/season/:seasonId', (req, res) => {
     res.json(season);
 })
 
-router.delete('/:seriesId/season/:seasonId', (req, res) => {
-    if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að eyða season' });
-        return;
-    }
+router.delete('/:seriesId/season/:seasonId', requireAuthentication, checkUserIsAdmin, (req, res) => {
     const {
         seriesId,
         seasonId
@@ -195,11 +152,7 @@ router.delete('/:seriesId/season/:seasonId', (req, res) => {
     res.json({ success });
 })
 
-router.post('/:seriesId/season/:seasonId/episode', (req, res) => {
-    if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að búa til nýjan episode' });
-        return;
-    }
+router.post('/:seriesId/season/:seasonId/episode', requireAuthentication, checkUserIsAdmin, (req, res) => {
     const {
         seriesId,
         seasonId
@@ -218,11 +171,7 @@ router.get('/:seriesId/season/:seasonId/episode/:episodeId', (req, res) => {
     res.json(episode);
 })
 
-router.delete('/:seriesId/season/:seasonId/episode/:episodeId', (req, res) => {
-    if (!req.user.admin) {
-        res.status(401).json({ error: 'Villa við að eyða episode' });
-        return;
-    }
+router.delete('/:seriesId/season/:seasonId/episode/:episodeId', requireAuthentication, checkUserIsAdmin, (req, res) => {
     const {
         seriesId,
         seasonId,

@@ -1,16 +1,16 @@
 import passport from 'passport';
-import { Strategy } from 'passport-local';
 import jwt from 'jsonwebtoken';
 import {
     Strategy as StrategyJWT, ExtractJwt,
   } from 'passport-jwt';
 import { comparePasswords, findByUsername, findById } from './users.js';
 
-export const tokenLifeTime = 60 * 60 * 24 * 7; // 7 dagar
-
 const {
     JWT_SECRET: jwtSecret,
+    TOKEN_LIFETIME: tokenLifeTime = 60 * 60 * 24 * 7
 } = process.env;
+
+export { tokenLifeTime };
 
 if (!jwtSecret) {
     console.error('Vantar .env gildi');
@@ -32,17 +32,17 @@ export const jwtOptions = {
  * @param {string} password Lykilorð til að athuga
  * @param {function} done Fall sem kallað er í með niðurstöðu
  */
-async function strat(username, password, done) {
+async function strat(data, done) {
   try {
-    const user = await findByUsername(username);
-
+    const user = await findById(data.id);
     if (!user) {
       return done(null, false);
     }
+    return done(null, user);
 
-    // Verður annað hvort notanda hlutur ef lykilorð rétt, eða false
+    /* // Verður annað hvort notanda hlutur ef lykilorð rétt, eða false
     const result = await comparePasswords(password, user.password);
-    return done(null, result ? user : false);
+    return done(null, result ? user : false); */
   } catch (err) {
     console.error(err);
     return done(err);
@@ -51,7 +51,8 @@ async function strat(username, password, done) {
 
 
 // Notum local strategy með „strattinu“ okkar til að leita að notanda
-passport.use(new Strategy(jwtOptions, strat));
+passport.use(new StrategyJWT(jwtOptions, strat));
+
 
 // getum stillt með því að senda options hlut með
 // passport.use(new Strategy({ usernameField: 'email' }, strat));
@@ -82,8 +83,7 @@ function ensureLoggedIn(req, res, next) {
 }
 
 export function requireAuthentication(req, res, next) {
-  console.log("require")
-  return passport.authenticate(
+  passport.authenticate(
     'jwt',
     { session: false },
     (err, user, info) => {
@@ -92,7 +92,7 @@ export function requireAuthentication(req, res, next) {
       }
 
       if (!user) {
-        const error = info.name === 'TokenExpiredError'
+        const error = info?.name === 'TokenExpiredError'
           ? 'expired token' : 'invalid token';
 
         return res.status(401).json({ error });

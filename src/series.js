@@ -4,7 +4,7 @@ export function findSeries(id) {
 }
 
 export function addSeries(data) {
-    console.log(data);
+    // console.log(data);
     return true;
 }
 

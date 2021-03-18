@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 
 import { router as tvRouter } from './tv.js';
 import { router as adminRouter } from './admin.js';
+import passport, { requireAuthentication } from './login.js';
 
 dotenv.config();
 
@@ -37,8 +38,7 @@ app.use(session({
   maxAge: 20 * 1000, // 20 sek
 }));
 
-/* app.use(passport.initialize());
-app.use(passport.session()); */
+app.use(passport.initialize())
 
 app.locals.formatDate = (str) => {
   let date = '';
