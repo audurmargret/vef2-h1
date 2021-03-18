@@ -115,6 +115,42 @@ export async function createGenre(data){
         }
 }
 
+async function getGenreId(genre){
+    const q = `
+        SELECT id FROM TVgenre WHERE typeName = $1
+    `;
+    const value = [genre];
+    const result = await query(q, value);
+    return result.rows[0].id;
+}
+
+export async function connectGenre(data) {
+    const q = `
+        INSERT INTO
+          TVconnect (
+            tvseries_id,
+            tvgenre_id)
+          VALUES ($1, $2);
+    `;
+    const genres = data.genres.split(',');
+    let genre_id = [];
+    for (let i = 0; i < genres.length; i++){
+        const id = await getGenreId(genres[i]);
+        genre_id.push(id);
+    }
+    try {
+        for (let i = 0; i < genres.length; i++){
+            await query(q, [
+                data.id,
+                genre_id[i]
+            ]);
+        }
+        
+    } catch(e) {
+        console.info('Villa við að tengja genre', e);
+    }
+}
+
 export async function createSeasons(data) {
     const q = `
         INSERT INTO
