@@ -21,7 +21,7 @@ export async function findByUsername(username) {
       return result.rows[0];
     }
   } catch (e) {
-    console.error('Gat ekki fundið notanda eftir notendnafni');
+    console.error('Gat ekki fundið notanda eftir notendanafni');
     return null;
   }
 
