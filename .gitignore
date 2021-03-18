@@ -21,6 +21,3 @@ yarn-debug.log*
 yarn-error.log*
 
 .env
-
-/src/gagnagrunnur.js
-/src/db.js
