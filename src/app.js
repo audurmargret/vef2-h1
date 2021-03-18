@@ -27,6 +27,7 @@ const app = express();
 const path = dirname(fileURLToPath(import.meta.url));
 
 app.use(express.static(join(path, '../public')));
+app.use(express.json())
 
 app.use(session({
   secret: sessionSecret,

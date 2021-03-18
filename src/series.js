@@ -3,7 +3,13 @@ export function findSeries(id) {
     return { name: "Cool shows" };
 }
 
-export function updateSeries(id) {
+export function addSeries(data) {
+    console.log(data);
+    return true;
+}
+
+export function updateSeries(id, data) {
+    console.log(data);
     return true;
 }
 

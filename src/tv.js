@@ -8,7 +8,8 @@ import {
     deleteSeriesState,
     deleteSeries,
     updateSeries,
-    findSeries
+    findSeries,
+    addSeries
 } from './series.js';
 import { 
     allSeasons, 
@@ -24,11 +25,16 @@ router.get('/', (req, res) => {
 });
 
 router.post('/', (req, res) => {
-    if (!req.user.admin) {
+    /* if (!req.user.admin) {
         res.json({ error: 'Villa við að búa til nýtt series' });
         return;
+    } */
+    const success = addSeries(req.body);
+    if (success) {
+        res.json({ msg: 'Bætti við þáttaröð'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að bæta við þáttaröð'});
     }
-    res.json({ msg: 'Bætti við þátt'});
 })
 
 router.get('/:seriesId', (req, res) => {
@@ -40,39 +46,51 @@ router.get('/:seriesId', (req, res) => {
 })
 
 router.patch('/:seriesId', (req, res) => {
-    if (!req.user.admin) {
+    /* if (!req.user.admin) {
         res.status(401).json({ error: 'Villa við að uppfæra serie' });
         return;
-    }
+    } */
     const {
         seriesId
     } = req.params;
-    const success = updateSeries(seriesId);
-    res.json({success});
+    const success = updateSeries(seriesId, req.body);
+    if (success) {
+        res.json({ msg: 'Uppfærði þáttaröð'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að uppfæra þáttaröð'});
+    }
 })
 
 router.delete('/:seriesId', (req, res) => {
-    if (!req.user.admin) {
+    /* if (!req.user.admin) {
         res.status(401).json({ error: 'Villa við að eyða serie' });
         return;
-    }
+    } */
     const {
         seriesId
     } = req.params;
     const success = deleteSeries(seriesId);
-    res.json({success});
+    if (success) {
+        res.json({ msg: 'Eyddi þáttaröð'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að eyða þáttaröð'});
+    }
 })
 
 router.post('/:seriesId/rate', (req, res) => {
-    if (!req.isAuthenticated()) {
-        res.status(401).json({ error: 'Villa við gefa einkunn' });
+    /* if (!req.isAuthenticated()) {
+        res.status(401).json({ error: 'Villa við að gefa einkunn' });
         return;
-    }
+    } */
     const {
         seriesId
     } = req.params;
-    const success = rateSeries(seriesId);
-    res.json({success});
+    const success = rateSeries(seriesId, req.body);
+    if (success) {
+        res.json({ msg: 'Tókst að gefa einkunn'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að gefa einkunn'});
+    }
 })
 
 router.patch('/:seriesId/rate', (req, res) => {
