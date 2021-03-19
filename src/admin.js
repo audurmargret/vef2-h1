@@ -4,7 +4,7 @@ import jwt from 'jsonwebtoken';
 
 import { query } from './db.js';
 import passport, { requireAuthentication, checkUserIsAdmin, jwtOptions, tokenLifeTime } from './login.js';
-import { comparePasswords, findById, findByUsername, updateAdmin, createUser, findAll } from './users.js';
+import { comparePasswords, findById, findByUsername, updateAdmin, createUser, findAll, updatePassword, updateEmail } from './users.js';
 import { catchErrors, pagingInfo, PAGE_SIZE } from './utils.js';
 
 export const router = express.Router();
@@ -53,19 +53,34 @@ async function register(req, res) {
     const newUser = await findByUsername(username);
 
     // TODO:  hér á bar að skila auðkenni og netfangi
-    return res.json({newUser})
+    return res.json({id: newUser.id,
+                     username: newUser.username,
+                     email: newUser.email});
 }
 
-function meGET(req, res) {
+async function meGET(req, res) {
     // 'GET skilar upplýsingum um notanda sem á token, auðkenni og netfangi, aðeins ef notandi innskráður'
-
-    return res.json({todo: 'GET skilar upplýsingum um notanda sem á token, auðkenni og netfangi, aðeins ef notandi innskráður'})
+    const user = await findById(req.user.id);
+    return res.json({id: user.id,
+                     username: user.username,
+                     email: user.email});
 }
 
-function mePATCH(req, res) {
+async function mePATCH(req, res) {
     // 'PATCH uppfærir netfang, lykilorð eða bæði ef gögn rétt, aðeins ef notandi innskráður'
+    const {email, password = ''} = req.body;
+    const userID = req.user.id;
+    if(password !== '') {
+        updatePassword(userID, password);
+    }
+    if(email !== '') {
+        updateEmail(userID, email);
+    }
+    const user = await findById(userID);
 
-    return res.json({todo:'PATCH uppfærir netfang, lykilorð eða bæði ef gögn rétt, aðeins ef notandi innskráður' })
+    return res.json({id: user.id,
+                     username: user.username,
+                     email: user.email});
 }
 
 async function userGET(req, res) {
@@ -85,38 +100,29 @@ async function userPATCH(req, res) {
         id: userID
     } = req.params;
 
-    // TODO: við komandi verður að vera admin
-    // TODO: ef það er verið að reyna breyta sjálfum sér:
+    if(parseInt(userID) === req.user.id){
+        return res.json('Ekki hægt að breyta sjálfum sér');
+    }
 
     const user = await findById(userID)
-
     const update = await updateAdmin(userID);
+    
+    if(update){
+        return res.json({ 
+            id: userID, 
+            user: user,
+        });
+    }
 
-    return res.json({ 
-        id: userID, 
-        user: user,
- });
+    return res.json('Gat ekki uppfært notanda');
 }
 
-//router.get('/', requireAuthentication, checkUserIsAdmin, catchErrors(index));
-router.get('/', catchErrors(index));
-router.get('/me', meGET);
-router.get('/:id', userGET);
+router.get('/', requireAuthentication, checkUserIsAdmin, catchErrors(index));
+router.get('/me', requireAuthentication, catchErrors(meGET));
+router.get('/:id', requireAuthentication, checkUserIsAdmin, catchErrors(userGET));
 
-router.post('/login', login);
+router.post('/login', catchErrors(login));
 router.post('/register', catchErrors(register));
 
-router.patch('/me', mePATCH);
-router.patch('/:id', userPATCH);
-
-
-/*  TODO: á ekki að vera logout?? 
-
-
-router.get('/logout', (req, res) => {
-  // logout hendir session cookie og session
-  req.logout();
-  res.redirect('/');
-}); 
-
-*/ 
+router.patch('/me',requireAuthentication, catchErrors(mePATCH));
+router.patch('/:id', requireAuthentication, checkUserIsAdmin, catchErrors(userPATCH));

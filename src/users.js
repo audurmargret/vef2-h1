@@ -27,9 +27,8 @@ export async function findByUsername(username) {
     const result = await query(q, [username]);
     // console.log(result.rowCount)
     if (result.rowCount === 1) {
-      
+      console.log(result.rows[0].id)
       return result.rows[0];
-
     }
   } catch (e) {
     console.error('Gat ekki fundið notanda eftir notendanafni');
@@ -66,7 +65,29 @@ export async function updateAdmin(userID) {
   } catch(e) {
     console.error('Gat ekki uppfært admin réttindi');
   }
-
+  return false;
+}
+export async function updateEmail(userID, email) {
+  const q = `UPDATE users SET email = $1 WHERE id = $2`;
+  const values = [email, userID];
+  try {
+    const result = await query(q, values);
+    return true;
+  } catch(e) {
+    console.error('Gat ekki uppfært tölvupóstfang');
+  }
+  return false;
+}
+export async function updatePassword(userID, password) {
+  const hashedPassword = await bcrypt.hash(password, 11);
+  const q = `UPDATE users SET password = $1 WHERE id = $2`;
+  const values = [hashedPassword, userID];
+  try {
+    const result = await query(q, values);
+    return true;
+  } catch(e) {
+    console.error('Gat ekki uppfært lykilorð');
+  }
   return false;
 }
 
