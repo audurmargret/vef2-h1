@@ -104,10 +104,7 @@ export function requireAuthentication(req, res, next) {
   )(req, res, next);
 }
 
-  
 export function checkUserIsAdmin(req, res, next) {
-  console.log("req user", req.user)
-  console.log("req user admin", req.user.admin)
   if (req.user && req.user.admin) {
     return next();
   }

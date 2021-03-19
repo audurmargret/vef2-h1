@@ -25,9 +25,7 @@ export async function findByUsername(username) {
   const q = `SELECT * FROM users WHERE username = $1`;
   try {
     const result = await query(q, [username]);
-    // console.log(result.rowCount)
     if (result.rowCount === 1) {
-      console.log(result.rows[0].id)
       return result.rows[0];
     }
   } catch (e) {
