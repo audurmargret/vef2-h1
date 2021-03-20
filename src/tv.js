@@ -70,7 +70,7 @@ router.post('/:seriesId/rate', requireAuthentication, (req, res) => {
     const {
         seriesId
     } = req.params;
-    const success = rateSeries(seriesId, req.body);
+    const success = rateSeries(seriesId, req.user.id, req.body);
     if (success) {
         res.json({ msg: 'Tókst að gefa einkunn'});
     } else {
@@ -82,16 +82,24 @@ router.patch('/:seriesId/rate', requireAuthentication, (req, res) => {
     const {
         seriesId
     } = req.params;
-    const success = updateSeriesRating(seriesId);
-    res.json({success});
+    const success = updateSeriesRating(seriesId, req.user.id, req.body);
+    if (success) {
+        res.json({ msg: 'Tókst að uppfæra einkunn'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að uppfæra einkunn'});
+    }
 })
 
 router.delete('/:seriesId/rate', requireAuthentication, (req, res) => {
     const {
         seriesId
     } = req.params;
-    const success = deleteSeriesRating(seriesId);
-    res.json({success});
+    const success = deleteSeriesRating(seriesId, req.user.id);
+    if (success) {
+        res.json({ msg: 'Tókst að eyða einkunn'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að eyða einkunn'});
+    }
 })
 
 router.post('/:seriesId/state', requireAuthentication, (req, res) => {
@@ -99,7 +107,11 @@ router.post('/:seriesId/state', requireAuthentication, (req, res) => {
         seriesId
     } = req.params;
     const success = stateSeries(seriesId);
-    res.json({success});
+    if (success) {
+        res.json({ msg: 'Tókst að setja stöðu'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að setja stöðu'});
+    }
 })
 
 router.patch('/:seriesId/state', requireAuthentication, (req, res) => {
@@ -107,7 +119,11 @@ router.patch('/:seriesId/state', requireAuthentication, (req, res) => {
         seriesId
     } = req.params;
     const success = updateSeriesState(seriesId);
-    res.json({success});
+    if (success) {
+        res.json({ msg: 'Tókst að uppfæra stöðu'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að uppfæra stöðu'});
+    }
 })
 
 router.delete('/:seriesId/state', requireAuthentication, (req, res) => {
@@ -115,7 +131,11 @@ router.delete('/:seriesId/state', requireAuthentication, (req, res) => {
         seriesId
     } = req.params;
     const success = deleteSeriesState(seriesId);
-    res.json({success});
+    if (success) {
+        res.json({ msg: 'Tókst að eyða stöðu'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að eyða stöðu'});
+    }
 })
 
 router.get('/:seriesId/season', async (req, res) => {
