@@ -4,7 +4,7 @@ import util from 'util';
 import pg from 'pg';
 import bcrypt from 'bcrypt';
 import csv from 'csv-parser';
-import { connectGenre, createEpisodes, createGenre, createSeasons, createSeries } from './db.js';
+import { allImages, connectGenre, createEpisodes, createGenre, createSeasons, createSeries } from './db.js';
 
 dotenv.config();
 
@@ -40,42 +40,51 @@ async function query(q, values = []) {
   }
 }
 
+async function readCSV(file) {
+  return new Promise((resolve, reject) => {
+    const data = [];
+    fs.createReadStream(file)
+    .pipe(csv())
+    .on('data', (row) => {
+      data.push(row)
+    })
+    .on('end', () => {
+      resolve(data);
+    })
+    .on('error', (error) => {
+      reject(error);
+    })
+  })
+}
+
 async function insertSeries(file) {
-  fs.createReadStream(file)
-  .pipe(csv())
-  .on('data', async (row) => {
+  const data = await readCSV(file);
+  data.forEach(async (row) => {
     await createSeries(row);
     await createGenre(row);
     await connectGenre(row);
-  })
-  .on('end', () => {
-    console.log('series.csv importað');
-  })
+  });
+  console.log('series.csv importað');
 }
 
 async function insertSeasons(file) {
-  fs.createReadStream(file)
-  .pipe(csv())
-  .on('data', async (row) => {
+  const data = await readCSV(file);
+  data.forEach(async (row) => {
     await createSeasons(row);
-  })
-  .on('end', () => {
-    console.log('seasons.csv importað');
-  })
+  });
+  console.log('seasons.csv importað');
 }
 
 async function insertEpisodes(file) {
-  fs.createReadStream(file)
-  .pipe(csv())
-  .on('data', async (row) => {
+  const data = await readCSV(file);
+  data.forEach(async (row) => {
     await createEpisodes(row);
-  })
-  .on('end', () => {
-    console.log('episodes.csv importað');
-  })
+  });
+  console.log('episodes.csv importað');
 }
 
 async function main() {
+  await allImages();
   console.info(`Set upp gagnagrunn á ${connectionString}`);
   // droppa töflu ef til
   await query('DROP TABLE IF EXISTS TVseries cascade');
@@ -106,7 +115,7 @@ async function main() {
 
     // TODO: Bæta við gögnum úr data möppunni
     
-    
+    console.info("Set inn series")
     await insertSeries('./data/series.csv');
     await insertSeasons('./data/seasons.csv');
     await insertEpisodes('./data/episodes.csv');
@@ -118,6 +127,6 @@ async function main() {
   }
 }
 
-main().catch((err) => {
+await main().catch((err) => {
   console.error(err);
 });

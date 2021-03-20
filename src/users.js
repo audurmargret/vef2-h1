@@ -11,10 +11,10 @@ export async function comparePasswords(password, hash) {
   return false;
 }
 
-export async function findAll() {
-  const q = 'SELECT * FROM users;';
+export async function findAll(limit = 10, offset = 0) {
+  const q = 'SELECT * FROM users LIMIT $1 OFFSET $2;';
   try {
-    const result = await query(q);
+    const result = await query(q, [ limit, offset ]);
     return result.rows;
   } catch (e) {
     console.error('Gat ekki fundið alla notendur');

@@ -10,9 +10,11 @@ export const router = express.Router();
 router.use(express.json());
 
 async function index(req, res) {
-  // TODO:  paging
-  const string = 'SELECT * FROM users;';
-  const userList = await findAll();
+  const {
+    limit: limit,
+    offset: offset
+  } = req.query;
+  const userList = await findAll(limit, offset);
   const length = Object.keys(userList).length;
   for(let i = 0; i < length; i++){
       delete userList[i].password;

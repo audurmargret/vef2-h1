@@ -1,5 +1,9 @@
 import pg from 'pg';
 import dotenv from 'dotenv';
+import cloudinary from 'cloudinary';
+import { join, dirname, extname } from 'path';
+import { fileURLToPath } from 'url';
+import { readdir } from 'fs/promises';
 
 dotenv.config();
 
@@ -12,6 +16,16 @@ const {
 const ssl = nodeEnv !== 'development' ? { rejectUnauthorized: false } : false;
 
 const pool = new pg.Pool({ connectionString, ssl });
+
+cloudinary.config({ 
+  cloud_name: 'dwx7hyahv', 
+  api_key: '377459241788154', 
+  api_secret: 'oBO1nzGak8XIuTpR4q0PfI98yY0' 
+});
+
+const imageUploader = cloudinary.v2; 
+const path = dirname(fileURLToPath(import.meta.url));
+const imageUrlMap = new Map();
 
 pool.on('error', (err) => {
   console.error('Villa í tengingu við gagnagrunn, forrit hættir', err);
@@ -61,6 +75,45 @@ export async function insert({
   return success;
 }
 
+export async function uploadImage(imageId) {
+  return new Promise((resolve, reject) => {
+    if (imageId){
+      imageUploader.uploader.upload('./data/img/' + imageId, {
+        use_filename: true, 
+        unique_filename: false, 
+        overwrite: false
+      },(error, result) => {
+        if (error) {
+          console.error("Villa við að hlaða upp mynd: " + error);
+          reject(null);
+        }
+        else {
+          resolve(result.url);
+        }
+      })
+    }
+    else resolve();
+  })
+}
+
+async function getLocalImages(path) {
+  var localImages = [];
+  try {
+    localImages = readdir(path)
+  } catch (e) {
+    console.error(e);
+  }
+  return localImages
+}
+
+export async function allImages() {
+  const localImages = await getLocalImages(join(path, './../data/img'));
+  return Promise.all(localImages.map(async (file) => {
+    const imageUrl = await uploadImage(file);
+    imageUrlMap.set(file, imageUrl);
+  }));
+}
+
 export async function createSeries(data){
     const q = `
         INSERT INTO 
@@ -77,6 +130,7 @@ export async function createSeries(data){
             url)
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     `;
+    const imageUrl = imageUrlMap.get(data.image);
     try {
         await query(q, [
             data.id,
@@ -84,7 +138,7 @@ export async function createSeries(data){
             data.airDate,
             data.inProduction,
             data.tagline,
-            data.image,
+            imageUrl,
             data.description,
             data.language,
             data.network,
@@ -121,6 +175,7 @@ async function getGenreId(genre){
     `;
     const value = [genre];
     const result = await query(q, value);
+
     return result.rows[0].id;
 }
 
@@ -167,13 +222,14 @@ export async function createSeasons(data) {
     if (date == ''){
         date = null;
     }
+    const imageUrl = imageUrlMap.get(data.poster);
     try {
         await query(q, [
             data.name,
             data.number,
             date,
             data.overview,
-            data.poster,
+            imageUrl,
             data.serieId
         ]);
     } catch(e) {
