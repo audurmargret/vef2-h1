@@ -217,3 +217,17 @@ router.delete('/:seriesId/season/:seasonId/episode/:episodeId', requireAuthentic
         res.status(500).json({ msg: 'Villa við að eyða þætti'});
     }
 })
+
+router.get('/genres', (req, res) => {
+    const genres = getGenres();
+    res.json(genres);
+})
+
+router.post('/genres', requireAuthentication, checkUserIsAdmin, (req, res) => {
+    const success = addGenre(req.body.genre);
+    if (success) {
+        res.json({ msg: 'Tókst að búa til tegund'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að búa til tegund'});
+    }
+})
