@@ -56,11 +56,11 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS userConnect (
 	id serial primary key,
-	episode_id integer,
+	series_id integer,
 	user_id integer,
 	status varchar(64),
 	rating integer,
-	foreign key (episode_id) references episodes(id) on delete cascade,
+	foreign key (series_id) references TVseries(id) on delete cascade,
 	foreign key (user_id) references users(id) on delete cascade
 );
 
