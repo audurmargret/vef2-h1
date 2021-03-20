@@ -157,8 +157,12 @@ router.post('/:seriesId/season/:seasonId/episode', requireAuthentication, checkU
         seriesId,
         seasonId
     } = req.params;
-    const success = addEpisode(seriesId, seasonId);
-    res.json( { success } );
+    const success = addEpisode(seriesId, seasonId, req.body);
+    if (success) {
+        res.json({ msg: 'Bætti við þætti'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að bæta við þætti'});
+    }
 })
 
 router.get('/:seriesId/season/:seasonId/episode/:episodeId', (req, res) => {
@@ -178,5 +182,9 @@ router.delete('/:seriesId/season/:seasonId/episode/:episodeId', requireAuthentic
         episodeId
     } = req.params;
     const success = deleteEpisode(seriesId, seasonId, episodeId);
-    res.json( { success } );
+    if (success) {
+        res.json({ msg: 'Eyddi þætti'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að eyða þætti'});
+    }
 })
