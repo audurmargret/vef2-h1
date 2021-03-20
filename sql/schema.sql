@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS episodes(
 	about text,
 	season integer,
 	series_id integer,
-	foreign key (series_id) references TVseries(id)
+	foreign key (series_id) references TVseries(id) on delete cascade
 );
 
 CREATE TABLE IF NOT EXISTS users (
