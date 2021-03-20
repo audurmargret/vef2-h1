@@ -66,12 +66,19 @@ router.get('/:seriesId', halfRequireAuthentication, async (req, res) => {
     }
     if(req.user) {
         const info = await getStateAndRate(seriesId, req.user)
-        series = { ...series, userRating: info.rating, userStatus: info.status};
+        if(info.rating){
+            series = { ...series, userRating: info.rating};
+        }
+        if(info.status){
+            series = { ...series, userStatus: info.status};
+        }
+
     }
 
     const avg = await getInfo(seriesId)
     const genres = await getInfoGenres(seriesId);
-    series = { ...series, averageRating: avg.avg, totalRatings: avg.counter, genres: genres}
+    const seasons = await allSeasons(seriesId);
+    series = { ...series, averageRating: avg.avg, totalRatings: avg.counter, genres: genres, seasons}
 
     return res.json(series);
 })
@@ -88,11 +95,12 @@ router.patch('/:seriesId', requireAuthentication, checkUserIsAdmin, async (req, 
     }
 })
 
-router.delete('/:seriesId', requireAuthentication, checkUserIsAdmin, (req, res) => {
+router.delete('/:seriesId', requireAuthentication, checkUserIsAdmin, async (req, res) => {
     const {
         seriesId
     } = req.params;
-    const success = deleteSeries(seriesId);
+    const success = await deleteSeries(seriesId);
+    console.log(success)
     if (success) {
         res.json({ msg: 'Eyddi þáttaröð'});
     } else {

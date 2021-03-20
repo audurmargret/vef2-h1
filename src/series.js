@@ -91,10 +91,12 @@ export async function deleteSeries(id) {
     const q = `
         DELETE FROM TVseries WHERE id = $1
     `;
+    // TODO: deleta öllu allstaðar sem þessi tvseries kemur fyrir
     try {
-        await query(q, id);
+        await query(q, [id]);
         return true;
     } catch(e) {
+        console.error('Gat ekki eytt þáttaröð', e)
         return false;
     }
 }
@@ -228,6 +230,7 @@ export async function deleteSeriesState(id, user) {
             ]);
             return true;
         } catch(e) {
+            console.error('Gat ekki eytt stöðu', e)
             return false;
         }
 }
