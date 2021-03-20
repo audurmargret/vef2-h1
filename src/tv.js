@@ -118,29 +118,44 @@ router.delete('/:seriesId/state', requireAuthentication, (req, res) => {
     res.json({success});
 })
 
-router.get('/:seriesId/season', (req, res) => {
+router.get('/:seriesId/season', async (req, res) => {
     const {
         seriesId
     } = req.params;
-    const seasons = allSeasons(seriesId);
-    res.json(seasons);
+    const seasons = await allSeasons(seriesId);
+    return res.json(seasons);
 })
 
-router.post('/:seriesId/season', requireAuthentication, checkUserIsAdmin, (req, res) => {
+router.post('/:seriesId/season', requireAuthentication, checkUserIsAdmin, async (req, res) => {
     const {
         seriesId
     } = req.params;
-    const success = addSeason(seriesId);
-    res.json({ success });
+    const {
+      showName,
+      season_num,
+      releaseDate,
+      about,
+      photo,
+      series_id,
+    } = req.body
+    console.log(req.body)
+    const success = await addSeason(req.body);
+    if(success) {
+        return res.json('Seríu bætt við')
+    }
+    return res.json('Ekki tókst að bæta seríu við');
 })
 
-router.get('/:seriesId/season/:seasonId', (req, res) => {
+router.get('/:seriesId/season/:seasonId', async (req, res) => {
     const {
         seriesId,
         seasonId
     } = req.params;
-    const season = findSeason(seriesId, seasonId);
-    res.json(season);
+    const season =  await findSeason(seriesId, seasonId);
+    if(season) {
+        return res.json(season);
+    }
+    return res.json('Fann ekki seríu')
 })
 
 router.delete('/:seriesId/season/:seasonId', requireAuthentication, checkUserIsAdmin, (req, res) => {
@@ -149,7 +164,10 @@ router.delete('/:seriesId/season/:seasonId', requireAuthentication, checkUserIsA
         seasonId
     } = req.params;
     const success = deleteSeason(seriesId, seasonId);
-    res.json({ success });
+    if(success) {
+        return res.json('Seríu eytt')
+    }
+    return res.json('Gat ekki eytt seríu');
 })
 
 router.post('/:seriesId/season/:seasonId/episode', requireAuthentication, checkUserIsAdmin, (req, res) => {
