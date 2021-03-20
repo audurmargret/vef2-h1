@@ -248,15 +248,21 @@ export async function getStateAndRate(id, user) {
     }
 }
 
-export async function getRatingAvg(id) {
+export async function getInfo(id) {
   const q = `SELECT * FROM userConnect WHERE series_id = $1`;
   let sum = 0;
+  let counter = 0;
+  
   try {
       const result = await query(q, [id]);
       for(let i=0; i<result.rowCount; i++) {
         sum += result.rows[i].rating;
+        if(result.rows[i].rating !== null) {
+            counter++;
+        }
       }
-      return sum/result.rowCount;
+       const avg = sum/counter;
+       return {avg, counter}
   } catch (e) {
       return null
   }

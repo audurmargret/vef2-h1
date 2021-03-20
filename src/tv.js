@@ -11,7 +11,7 @@ import {
     findSeries,
     addSeries,
     getStateAndRate,
-    getRatingAvg
+    getInfo
 } from './series.js';
 import { 
     allSeasons, 
@@ -21,6 +21,8 @@ import {
 } from './seasons.js';
 import { addEpisode, findEpisode, deleteEpisode } from './episodes.js';
 import { checkUserIsAdmin, halfRequireAuthentication, requireAuthentication } from './login.js';
+import { getGenres, addGenre, getInfoGenres } from './genres.js'
+import { Result } from 'express-validator';
 export const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -36,26 +38,40 @@ router.post('/', requireAuthentication, checkUserIsAdmin, (req, res) => {
     }
 })
 
+router.get('/genres', async (req, res) => {
+    const genres = await getGenres();
+    if(genres) {
+        return res.json(genres);
+    }
+    else return res.status(500).json({error: 'Villa að sækja genres'})
+})
+
+router.post('/genres', requireAuthentication, checkUserIsAdmin, async (req, res) => {
+    console.log(req.body.genre)
+    const success = await addGenre(req.body.genre);
+    if (success) {
+        res.json({ msg: 'Tókst að búa til tegund'});
+    } else {
+        res.status(500).json({ msg: 'Villa við að búa til tegund'});
+    }
+})
+
 router.get('/:seriesId', halfRequireAuthentication, async (req, res) => {
     const {
         seriesId
     } = req.params;
     let series = await findSeries(seriesId);
+    if(!series){
+      return res.status(404).json({error:'Sería fannst ekki'})
+    }
     if(req.user) {
-        console.log(req.user.id)
         const info = await getStateAndRate(seriesId, req.user)
-        console.log(info)
         series = { ...series, userRating: info.rating, userStatus: info.status};
-        console.log(series)
     }
 
-    const avg = await getRatingAvg(seriesId)
-    series = { ...series, averageRating: avg}
-
-
-    // TODO: reikna rate
-    // TODO: state notanda
-    // TODO: rate notanda
+    const avg = await getInfo(seriesId)
+    const genres = await getInfoGenres(seriesId);
+    series = { ...series, averageRating: avg.avg, totalRatings: avg.counter, genres: genres}
 
     return res.json(series);
 })
@@ -162,6 +178,9 @@ router.get('/:seriesId/season', async (req, res) => {
         seriesId
     } = req.params;
     const seasons = await allSeasons(seriesId);
+    if(seasons.length === 0) {
+        return res.status(404).json({error: 'Sería fannst ekki'})
+    }
     return res.json(seasons);
 })
 
@@ -182,7 +201,7 @@ router.get('/:seriesId/season/:seasonId', async (req, res) => {
     if(season) {
         return res.json(season);
     }
-    return res.json({error: 'Fann ekki seríu'});
+    return res.status(404).json({error: 'Fann ekki seríu'});
 })
 
 router.delete('/:seriesId/season/:seasonId', requireAuthentication, checkUserIsAdmin, (req, res) => {
@@ -218,7 +237,7 @@ router.get('/:seriesId/season/:seasonId/episode/:episodeId', async (req, res) =>
     } = req.params;
     const episode = await findEpisode(seriesId, seasonId, episodeId);
     if(episode.length === 0) {
-        return res.json({error: 'Þáttur ekki til'});
+        return res.status(404).json({error: 'Þáttur ekki til'});
     }
     return res.json(episode);
 })
@@ -237,16 +256,3 @@ router.delete('/:seriesId/season/:seasonId/episode/:episodeId', requireAuthentic
     }
 })
 
-router.get('/genres', (req, res) => {
-    const genres = getGenres();
-    res.json(genres);
-})
-
-router.post('/genres', requireAuthentication, checkUserIsAdmin, (req, res) => {
-    const success = addGenre(req.body.genre);
-    if (success) {
-        res.json({ msg: 'Tókst að búa til tegund'});
-    } else {
-        res.status(500).json({ msg: 'Villa við að búa til tegund'});
-    }
-})
