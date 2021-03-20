@@ -127,18 +127,6 @@ router.get('/:seriesId/season', async (req, res) => {
 })
 
 router.post('/:seriesId/season', requireAuthentication, checkUserIsAdmin, async (req, res) => {
-    const {
-        seriesId
-    } = req.params;
-    const {
-      showName,
-      season_num,
-      releaseDate,
-      about,
-      photo,
-      series_id,
-    } = req.body
-    console.log(req.body)
     const success = await addSeason(req.body);
     if(success) {
         return res.json('Seríu bætt við')
@@ -170,12 +158,12 @@ router.delete('/:seriesId/season/:seasonId', requireAuthentication, checkUserIsA
     return res.json('Gat ekki eytt seríu');
 })
 
-router.post('/:seriesId/season/:seasonId/episode', requireAuthentication, checkUserIsAdmin, (req, res) => {
+router.post('/:seriesId/season/:seasonId/episode', requireAuthentication, checkUserIsAdmin, async (req, res) => {
     const {
         seriesId,
         seasonId
     } = req.params;
-    const success = addEpisode(seriesId, seasonId, req.body);
+    const success = await addEpisode(seriesId, seasonId, req.body);
     if (success) {
         res.json({ msg: 'Bætti við þætti'});
     } else {
@@ -183,14 +171,17 @@ router.post('/:seriesId/season/:seasonId/episode', requireAuthentication, checkU
     }
 })
 
-router.get('/:seriesId/season/:seasonId/episode/:episodeId', (req, res) => {
+router.get('/:seriesId/season/:seasonId/episode/:episodeId', async (req, res) => {
     const {
         seriesId,
         seasonId,
         episodeId
     } = req.params;
-    const episode = findEpisode(seriesId, seasonId, episodeId);
-    res.json(episode);
+    const episode = await findEpisode(seriesId, seasonId, episodeId);
+    if(episode.length === 0) {
+        return res.json('Þáttur ekki til')
+    }
+    return res.json(episode);
 })
 
 router.delete('/:seriesId/season/:seasonId/episode/:episodeId', requireAuthentication, checkUserIsAdmin, (req, res) => {

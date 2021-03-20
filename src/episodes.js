@@ -1,33 +1,35 @@
-import { query } from "./db";
-import { findSeason } from "./seasons";
+import { query } from './db.js';
+import { findSeason } from './seasons.js';
 
-export function addEpisode(seriesId, seasonId, data) {
+export async function addEpisode(seriesId, seasonId, data) {
     const q = `
     INSERT INTO 
         episodes (episodeName, epi_num, releaseDate, about, season, series_id)
     VALUES ($1, $2, $3, $4, $5, $6)
     `;
-    const season_numb = findSeason(seriesId, seasonId);
+    const season_numb = await findSeason(seriesId, seasonId);
     let date = data.releaseDate;
     if (date == '') {
         date = null;
     }
+    console.log("season_num", season_numb.season_num)
     try {
         await query(q, [
-            data.name,
-            data.epinumb,
+            data.episodeName,
+            data.epi_num,
             date,
             data.about,
-            season_numb.rows[0].season,
+            season_numb.season_num,
             seriesId
         ]);
         return true;
     } catch(e) {
+        console.error('Gat ekki bætt við þætti',e)
         return false;
     }
 }
 
-export function findEpisode(seriesId, season, epinumb) {
+export async function findEpisode(seriesId, season, epinumb) {
     const q = 'SELECT * FROM Episodes WHERE series_id = $1 AND season = $2 AND epi_num = $3';
     let result = '';
     try {
@@ -42,7 +44,7 @@ export function findEpisode(seriesId, season, epinumb) {
     return result.rows;
 }
 
-export function deleteEpisode(seriesId, season, epinumb) {
+export async function deleteEpisode(seriesId, season, epinumb) {
     const q = `
     DELETE from episodes WHERE series_id = $1 AND season = $2 AND epi_num = $3;
     `;
