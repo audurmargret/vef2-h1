@@ -1,11 +1,10 @@
 import express from 'express';
-import xss from 'xss';
 import jwt from 'jsonwebtoken';
 
-import { query } from './db.js';
-import passport, { requireAuthentication, checkUserIsAdmin, jwtOptions, tokenLifeTime } from './login.js';
+
+import { requireAuthentication, checkUserIsAdmin, jwtOptions, tokenLifeTime } from './login.js';
 import { comparePasswords, findById, findByUsername, updateAdmin, createUser, findAll, updatePassword, updateEmail } from './users.js';
-import { catchErrors, pagingInfo, PAGE_SIZE } from './utils.js';
+import { catchErrors } from './utils.js';
 
 export const router = express.Router();
 router.use(express.json());
@@ -27,7 +26,7 @@ async function login(req, res) {
   const user = await findByUsername(username);
 
   if (!user) {
-    return res.status(401).json({error: 'No such user'});
+    return res.status(401).json({error: 'Enginn notandi skráður á þessu notendanafni'});
   }
   const passwordIsCorrect = await comparePasswords(password, user.password);
 
@@ -37,7 +36,7 @@ async function login(req, res) {
     const token = jwt.sign(payload, jwtOptions.secretOrKey, tokenOptions);
     return res.json({ token });
   }
-  return res.json({ error: 'Invalid password' });
+  return res.json({ error: 'Vitlaust lykilorð' });
 }
 
 async function register(req, res) {
@@ -45,7 +44,7 @@ async function register(req, res) {
 
   const user = await findByUsername(username);
   if(user) {
-    return res.status(401).json({error: 'User already exist'})
+    return res.status(401).json({error: 'Þessi notandi er þegar til'})
   }
 
   await createUser(username, email, password, false);
@@ -99,7 +98,7 @@ async function userPATCH(req, res) {
   const user = await findById(userID)
   const update = await updateAdmin(userID);
   
-  if(update){
+  if(update) {
     return res.json({ 
       id: userID, 
       user: user,

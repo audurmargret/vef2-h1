@@ -1,9 +1,8 @@
 import passport from 'passport';
-import jwt from 'jsonwebtoken';
 import {
     Strategy as StrategyJWT, ExtractJwt,
   } from 'passport-jwt';
-import { comparePasswords, findByUsername, findById } from './users.js';
+import { findByUsername, findById } from './users.js';
 
 const {
     JWT_SECRET: jwtSecret,
@@ -40,22 +39,14 @@ async function strat(data, done) {
     }
     return done(null, user);
 
-    /* // Verður annað hvort notanda hlutur ef lykilorð rétt, eða false
-    const result = await comparePasswords(password, user.password);
-    return done(null, result ? user : false); */
   } catch (err) {
     console.error(err);
     return done(err);
   }
 }
 
-
 // Notum local strategy með „strattinu“ okkar til að leita að notanda
 passport.use(new StrategyJWT(jwtOptions, strat));
-
-
-// getum stillt með því að senda options hlut með
-// passport.use(new Strategy({ usernameField: 'email' }, strat));
 
 // Geymum username á notanda í session, það er nóg til að vita hvaða notandi þetta er
 passport.serializeUser((user, done) => {
@@ -71,16 +62,6 @@ passport.deserializeUser(async (username, done) => {
     done(err);
   }
 });
-
-// Hjálpar middleware sem athugar hvort notandi sé innskráður og hleypir okkur
-// þá áfram, annars sendir á /login
-function ensureLoggedIn(req, res, next) {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-
-  return res.redirect('/users/login');
-}
 
 export function requireAuthentication(req, res, next) {
   passport.authenticate(
