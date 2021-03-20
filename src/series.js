@@ -1,14 +1,24 @@
 import { query } from './db.js';
 
-export function findSeries(id) {
+export async function findSeries(id) {
     const q = `
         SELECT * FROM TVseries WHERE id = $1
     `;
-    const result = await query(q, id);
-    return result;
+    try{
+        const result = await query(q, [id]);
+        if(result.rowCount === 0) {
+            console.error('Þáttaröð fannst ekki');
+            return null;
+        }
+        return result.rows[0];
+    }
+    catch (e) {
+        console.error('Gat ekki sótt þáttaröð');
+        return null;
+    }
 }
 
-export function addSeries(data) {
+export async function addSeries(data) {
     const q = `
         INSERT INTO 
           TVseries (
@@ -41,7 +51,9 @@ export function addSeries(data) {
     }
 }
 
-export function updateSeries(id, data) {
+export async function updateSeries(id, data) {
+    console.log(data.showName)
+    console.log("id", id)
     const q = `
         UPDATE TVseries SET 
           showName = $1,
@@ -57,24 +69,25 @@ export function updateSeries(id, data) {
     `;
     try {
         await query(q, [
-            data.name,
-            data.airDate,
-            data.inProduction,
+            data.showName,
+            data.releaseDate,
+            data.stillGoing,
             data.tagline,
-            data.image,
-            data.description,
+            data.photo,
+            data.about,
             data.language,
-            data.network,
-            data.homepage,
+            data.channel,
+            data.url,
             id
         ]);
         return true;
     } catch(e) {
+        console.error('Villa við að uppfæra seríu', e)
         return false;
     }
 }
 
-export function deleteSeries(id) {
+export async function deleteSeries(id) {
     const q = `
         DELETE FROM TVseries WHERE id = $1
     `;
@@ -88,17 +101,19 @@ export function deleteSeries(id) {
 
 // Users föll tengd series
 
-export function userconnectExist(series_id, userID) {
+export async function userconnectExist(series_id, userID) {
     const q = `
         SELECT * FROM userConnect WHERE series_id = $1 AND user_id = $2
     `;
     const result = await query(q, [series_id, userID]);
-    if (Object.keys(result).length > 0) return true;
-    else return false;
+    console.log(Object.keys(result.rows).length)
+    if (Object.keys(result.rows).length === 0) return false;
+    else return true;
 }
 
-export function rateSeries(id, user, rating) {
-    if (userconnectExist(id, user)){
+export async function rateSeries(id, user, rating) {
+    if (await userconnectExist(id, user)){
+        console.log("hérnaaa")
         updateSeriesRating(id, user, rating)
     }
     else {
@@ -123,7 +138,7 @@ export function rateSeries(id, user, rating) {
     }
 }
 
-export function updateSeriesRating(id, user, rating) {
+export async function updateSeriesRating(id, user, rating) {
     const q = `
         UPDATE userConnect SET rating = $1 
         WHERE series_id = $2 AND user_id = $3
@@ -140,7 +155,7 @@ export function updateSeriesRating(id, user, rating) {
         }
 }
 
-export function deleteSeriesRating(id, user) {
+export async function deleteSeriesRating(id, user) {
     const q = `
         UPDATE userConnect SET rating = NULL 
         WHERE series_id = $1 AND user_id = $2
@@ -156,8 +171,9 @@ export function deleteSeriesRating(id, user) {
         }
 }
 
-export function stateSeries(id, user, state) {
-    if (userconnectExist(id, user)){
+export async function stateSeries(id, user, state) {
+    if (await userconnectExist(id, user)){
+        console.log("hér")
         updateSeriesState(id, user, state)
     }
     else {
@@ -177,12 +193,13 @@ export function stateSeries(id, user, state) {
             ]);
             return true;
         } catch(e) {
+            console.error('Gat ekki bætt við stöðu', e)
             return false;
         }
     }
 }
 
-export function updateSeriesState(id, user, state) {
+export async function updateSeriesState(id, user, state) {
     const q = `
         UPDATE userConnect SET status = $1 
         WHERE series_id = $2 AND user_id = $3
@@ -199,7 +216,7 @@ export function updateSeriesState(id, user, state) {
         }
 }
 
-export function deleteSeriesState(id, user) {
+export async function deleteSeriesState(id, user) {
     const q = `
         UPDATE userConnect SET status = NULL 
         WHERE series_id = $1 AND user_id = $2
@@ -213,4 +230,34 @@ export function deleteSeriesState(id, user) {
         } catch(e) {
             return false;
         }
+}
+
+export async function getStateAndRate(id, user) {
+    const q = `SELECT * FROM userConnect WHERE series_id = $1 AND user_id = $2`;
+    const values = [id, user.id];
+    try {
+        const result = await query(q, values);
+
+        if(result.rowCount > 0) {
+            return result.rows[0];
+        }
+        return null;
+    } catch (e){
+        console.error('Villa við að sækja stöðu og einkunn', e);
+        return null;
+    }
+}
+
+export async function getRatingAvg(id) {
+  const q = `SELECT * FROM userConnect WHERE series_id = $1`;
+  let sum = 0;
+  try {
+      const result = await query(q, [id]);
+      for(let i=0; i<result.rowCount; i++) {
+        sum += result.rows[i].rating;
+      }
+      return sum/result.rowCount;
+  } catch (e) {
+      return null
+  }
 }

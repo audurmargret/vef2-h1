@@ -62,7 +62,22 @@ passport.deserializeUser(async (username, done) => {
     done(err);
   }
 });
+export function halfRequireAuthentication(req, res, next) {
+  passport.authenticate(
+    'jwt',
+    { session: false },
+    (err, user, info) => {
+      if (err) {
+        return next(err);
+      }
 
+      if (user) {
+        req.user = user;
+      }
+      return next();
+    },
+  )(req, res, next);
+}
 export function requireAuthentication(req, res, next) {
   passport.authenticate(
     'jwt',
