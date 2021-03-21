@@ -21,9 +21,9 @@ const ssl = nodeEnv !== 'development' ? { rejectUnauthorized: false } : false;
 const pool = new pg.Pool({ connectionString, ssl });
 
 cloudinary.config({
-  cloudName,
-  apiKey,
-  apiSecret,
+  cloud_name: cloudName,
+  api_key: apiKey,
+  api_secret: apiSecret,
 });
 
 const imageUploader = cloudinary.v2;
