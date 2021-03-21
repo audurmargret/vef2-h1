@@ -1,13 +1,17 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import validator from 'express-validator';
 
 
 import { requireAuthentication, checkUserIsAdmin, jwtOptions, tokenLifeTime } from './login.js';
-import { comparePasswords, findById, findByUsername, updateAdmin, createUser, findAll, updatePassword, updateEmail } from './users.js';
+import { comparePasswords, findById, findByUsername, findByEmail, updateAdmin, createUser, findAll, updatePassword, updateEmail } from './users.js';
 import { catchErrors } from './utils.js';
+
 
 export const router = express.Router();
 router.use(express.json());
+
+const { check, validationResult } = validator;
 
 async function index(req, res) {
   const {
@@ -108,13 +112,63 @@ async function userPATCH(req, res) {
   }
   return res.json('Gat ekki uppfært notanda');
 }
+async function validUsername(value) {
+  const id = (await findByUsername(value)).rowCount;
+  if (id > 0) {
+    throw new Error('Notendanfn þegar skráð');
+  }
+  return true;
+}
+async function validEmail(value) {
+  const id = (await findByEmail(value));
+  if (id) {
+    throw new Error('Tölvupóstfang þegar skráð');
+  }
+  return true;
+}
+async function showErrors(req, res, next) {
+  const validation = validationResult(req);
+
+  if (!validation.isEmpty()) {
+    const errorMessages = validation.array();
+    return res.json({ errorMessages });
+  }
+  return next();
+}
+
+// Öll validations
+const validations = [
+  check('username')
+    .isLength({ min: 1 })
+    .withMessage('Notendanafn má ekki vera tómt'),
+
+  check('email')
+    .isLength({ min: 1 })
+    .withMessage('Tölvupóstfang má ekki vera tómt'),
+
+  check('email')
+    .isEmail()
+    .withMessage('Ógilt netfang'),
+
+  check('password')
+    .isLength({ min: 1 })
+    .withMessage('Lykilorð má ekki vera tómt'),
+  
+  check('username')
+    .blacklist('-').custom((val) => validUsername(val))
+    .withMessage('Notendanafn er ekki laust'),
+  
+  check('email')
+    .blacklist('-').custom((val) => validEmail(val))
+    .withMessage('Tölvupóstfang er ekki laust'),
+];
 
 router.get('/', requireAuthentication, checkUserIsAdmin, catchErrors(index));
 router.get('/me', requireAuthentication, catchErrors(meGET));
 router.get('/:id', requireAuthentication, checkUserIsAdmin, catchErrors(userGET));
 
 router.post('/login', catchErrors(login));
-router.post('/register', catchErrors(register));
+router.post('/register', validations, showErrors, catchErrors(register));
 
 router.patch('/me',requireAuthentication, catchErrors(mePATCH));
 router.patch('/:id', requireAuthentication, checkUserIsAdmin, catchErrors(userPATCH));

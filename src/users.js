@@ -51,6 +51,20 @@ export async function findById(id) {
 
   return null;
 }
+export async function findByEmail(email) {
+  const q = `SELECT * FROM users WHERE email = $1`;
+
+  try {
+    const result = await query(q, [email]);
+    if (result.rowCount === 1) {
+      return result.rows[0];
+    }
+  } catch (e) {
+    console.error('Gat ekki fundið notanda eftir netfangi');
+  }
+
+  return null;
+}
 
 export async function updateAdmin(userID) {
   const user = await findById(userID);
