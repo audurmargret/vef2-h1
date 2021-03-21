@@ -1,14 +1,15 @@
 import { query } from './db.js';
 
-export async function allSeasons(seriesId) {
-  const q = 'SELECT * FROM TVseasons WHERE seriesId = $1;';
-  try {
-    const result = await query(q, [seriesId]);
-    return result.rows;
-  } catch (e) {
-    console.error('Gat ekki sótt seríur', e);
-    return null;
-  }
+export async function allSeasons(seriesId, limit = 10, offset = 0) {
+    const q = `SELECT * FROM TVseasons WHERE series_id = $1 LIMIT $2 OFFSET $3;`;
+    try {
+        const result = await query(q,[seriesId, limit, offset]);
+        return result.rows;
+    }
+    catch (e) {
+      console.error('Gat ekki sótt seríur', e);
+      return null;
+    }
 }
 
 export async function addSeason(body) {
