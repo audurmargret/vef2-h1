@@ -1,5 +1,5 @@
-import { query, uploadImage } from './db.js';
 import fs from 'fs/promises';
+import { query, uploadImage } from './db.js';
 
 export async function allSeasons(seriesId, limit = 10, offset = 0) {
   const q = 'SELECT * FROM TVseasons WHERE seriesId = $1 LIMIT $2 OFFSET $3;';
@@ -15,12 +15,11 @@ export async function allSeasons(seriesId, limit = 10, offset = 0) {
 export async function addSeason(body, seriesId, imagePath) {
   const q = `INSERT INTO TVseasons (showName, seasonNum, releaseDate, about, photo, seriesId)
                VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;`;
-  var imageUrl;
+  let imageUrl;
   if (imagePath) {
     imageUrl = await uploadImage(imagePath);
     await fs.rm(imagePath);
   }
-  console.log(typeof(seriesId))
   const values = [
     body.showName,
     body.seasonNum,

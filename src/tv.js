@@ -1,4 +1,5 @@
 import express from 'express';
+import multer from 'multer';
 import {
   rateSeries,
   updateSeriesRating,
@@ -46,14 +47,13 @@ import {
   episodeSanitazions,
 } from './sanitazions.js';
 import {
-  getInfoGenres
-} from './genres.js'
-import multer from 'multer';
+  getInfoGenres,
+} from './genres.js';
 
 export const router = express.Router();
 
 function multerMiddleWare(req, res, next) {
-    multer({ dest: './temp' })
+  multer({ dest: './temp' })
     .single('image')(req, res, (err) => {
       if (err) {
         if (err.message === 'Unexpected field') {

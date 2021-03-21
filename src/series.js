@@ -1,5 +1,5 @@
-import { query, uploadImage } from './db.js';
 import fs from 'fs/promises';
+import { query, uploadImage } from './db.js';
 
 export async function findAllSeries(limit = 10, offset = 0) {
   const q = 'SELECT * FROM TVseries LIMIT $1 OFFSET $2';
@@ -45,7 +45,7 @@ export async function addSeries(data, imagePath) {
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `;
   try {
-    var imageUrl;
+    let imageUrl;
     if (imagePath) {
       imageUrl = await uploadImage(imagePath);
       await fs.rm(imagePath);
@@ -82,7 +82,7 @@ export async function updateSeries(id, data, imagePath) {
           url = $9
         WHERE id = $10
     `;
-  var imageUrl;
+  let imageUrl;
   if (imagePath) {
     imageUrl = await uploadImage(imagePath);
     await fs.rm(imagePath);

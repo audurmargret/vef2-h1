@@ -10,9 +10,9 @@ dotenv.config();
 const {
   DATABASE_URL: connectionString,
   NODE_ENV: nodeEnv = 'development',
-  CLOUD_NAME: cloud_name,
-  API_KEY: api_key,
-  API_SECRET: api_secret
+  CLOUD_NAME: cloudName,
+  API_KEY: apiKey,
+  API_SECRET: apiSecret,
 } = process.env;
 
 // Notum SSL tengingu við gagnagrunn ef við erum *ekki* í development mode, þ.e.a.s. á local vél
@@ -21,9 +21,9 @@ const ssl = nodeEnv !== 'development' ? { rejectUnauthorized: false } : false;
 const pool = new pg.Pool({ connectionString, ssl });
 
 cloudinary.config({
-  cloud_name,
-  api_key,
-  api_secret,
+  cloudName,
+  apiKey,
+  apiSecret,
 });
 
 const imageUploader = cloudinary.v2;
@@ -88,7 +88,7 @@ async function getLocalImages(localPath) {
 export async function allImages() {
   const localImages = await getLocalImages(join(path, './../data/img'));
   return Promise.all(localImages.map(async (file) => {
-    const imageUrl = await uploadImage('./data/img/' + file);
+    const imageUrl = await uploadImage(`./data/img/${file}`);
     imageUrlMap.set(file, imageUrl);
   }));
 }
