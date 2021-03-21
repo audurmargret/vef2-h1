@@ -10,6 +10,9 @@ dotenv.config();
 const {
   DATABASE_URL: connectionString,
   NODE_ENV: nodeEnv = 'development',
+  CLOUD_NAME: cloud_name,
+  API_KEY: api_key,
+  API_SECRET: api_secret
 } = process.env;
 
 // Notum SSL tengingu við gagnagrunn ef við erum *ekki* í development mode, þ.e.a.s. á local vél
@@ -18,9 +21,9 @@ const ssl = nodeEnv !== 'development' ? { rejectUnauthorized: false } : false;
 const pool = new pg.Pool({ connectionString, ssl });
 
 cloudinary.config({
-  cloud_name: 'dwx7hyahv',
-  api_key: '377459241788154',
-  api_secret: 'oBO1nzGak8XIuTpR4q0PfI98yY0',
+  cloud_name,
+  api_key,
+  api_secret,
 });
 
 const imageUploader = cloudinary.v2;
@@ -53,10 +56,10 @@ export async function query(_query, values = []) {
  * @returns {Promise<boolean>} Promise, resolved as true if inserted, otherwise false
  */
 
-export async function uploadImage(imageId) {
+export async function uploadImage(imagePath) {
   return new Promise((resolve, reject) => {
-    if (imageId) {
-      imageUploader.uploader.upload(`./data/img/${imageId}`, {
+    if (imagePath) {
+      imageUploader.uploader.upload(`${imagePath}`, {
         use_filename: true,
         unique_filename: false,
         overwrite: false,
@@ -85,7 +88,7 @@ async function getLocalImages(localPath) {
 export async function allImages() {
   const localImages = await getLocalImages(join(path, './../data/img'));
   return Promise.all(localImages.map(async (file) => {
-    const imageUrl = await uploadImage(file);
+    const imageUrl = await uploadImage('./data/img/' + file);
     imageUrlMap.set(file, imageUrl);
   }));
 }

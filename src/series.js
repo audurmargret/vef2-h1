@@ -1,6 +1,5 @@
-import { query } from './db.js';
-
-const imageUrlMap = new Map();
+import { query, uploadImage } from './db.js';
+import fs from 'fs/promises';
 
 export async function findAllSeries(limit = 10, offset = 0) {
   const q = 'SELECT * FROM TVseries LIMIT $1 OFFSET $2';
@@ -30,7 +29,7 @@ export async function findSeries(id) {
   }
 }
 
-export async function addSeries(data) {
+export async function addSeries(data, imagePath) {
   const q = `
         INSERT INTO 
           TVseries (
@@ -46,7 +45,11 @@ export async function addSeries(data) {
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `;
   try {
-    const imageUrl = imageUrlMap.get(data.photo);
+    var imageUrl;
+    if (imagePath) {
+      imageUrl = await uploadImage(imagePath);
+      await fs.rm(imagePath);
+    }
     await query(q, [
       data.showName,
       data.releaseDate,
@@ -65,7 +68,7 @@ export async function addSeries(data) {
   }
 }
 
-export async function updateSeries(id, data) {
+export async function updateSeries(id, data, imagePath) {
   const q = `
         UPDATE TVseries SET 
           showName = $1,
@@ -79,13 +82,18 @@ export async function updateSeries(id, data) {
           url = $9
         WHERE id = $10
     `;
+  var imageUrl;
+  if (imagePath) {
+    imageUrl = await uploadImage(imagePath);
+    await fs.rm(imagePath);
+  }
   try {
     await query(q, [
       data.showName,
       data.releaseDate,
       data.stillGoing,
       data.tagline,
-      data.photo,
+      imageUrl,
       data.about,
       data.language,
       data.channel,

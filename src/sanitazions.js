@@ -11,7 +11,6 @@ export const seriesSanitazions = [
   check('about').trim().escape(),
   check('language').trim().escape(),
   check('channel').trim().escape(),
-  check('url').trim().escape(),
 ];
 
 export const genreSanitazions = [

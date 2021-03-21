@@ -31,9 +31,6 @@ import {
   requireAuthentication,
 } from './login.js';
 import {
-  getInfoGenres,
-} from './genres.js';
-import {
   seriesValidations,
   showErrors,
   rateValidations,
@@ -48,8 +45,31 @@ import {
   seasonSanitazions,
   episodeSanitazions,
 } from './sanitazions.js';
+import {
+  getInfoGenres
+} from './genres.js'
+import multer from 'multer';
 
 export const router = express.Router();
+
+function multerMiddleWare(req, res, next) {
+    multer({ dest: './temp' })
+    .single('image')(req, res, (err) => {
+      if (err) {
+        if (err.message === 'Unexpected field') {
+          const errors = [{
+            field: 'image',
+            error: 'Unable to read image',
+          }];
+          return res.status(400).json({ errors });
+        }
+
+        return next(err);
+      }
+
+      return next();
+    });
+}
 
 router.get('/', async (req, res) => {
   const {
@@ -63,8 +83,8 @@ router.get('/', async (req, res) => {
   return res.status(500).json({ error: 'Villa við að sækja seríur' });
 });
 
-router.post('/', seriesValidations, showErrors, seriesSanitazions, requireAuthentication, checkUserIsAdmin, async (req, res) => {
-  const success = await addSeries(req.body);
+router.post('/', multerMiddleWare, seriesValidations, showErrors, seriesSanitazions, requireAuthentication, checkUserIsAdmin, async (req, res) => {
+  const success = await addSeries(req.body, req?.file?.path);
   if (success) {
     return res.json({ msg: 'Bætti við þáttaröð' });
   }
@@ -99,11 +119,11 @@ router.get('/:seriesId', halfRequireAuthentication, async (req, res) => {
   return res.json(series);
 });
 
-router.patch('/:seriesId', seriesValidations, showErrors, seriesSanitazions, requireAuthentication, checkUserIsAdmin, async (req, res) => {
+router.patch('/:seriesId', multerMiddleWare, seriesValidations, showErrors, seriesSanitazions, requireAuthentication, checkUserIsAdmin, async (req, res) => {
   const {
     seriesId,
   } = req.params;
-  const success = await updateSeries(seriesId, req.body);
+  const success = await updateSeries(seriesId, req.body, req?.file?.path);
   if (success) {
     return res.json({ msg: 'Uppfærði þáttaröð' });
   }
@@ -196,14 +216,17 @@ router.get('/:seriesId/season', async (req, res) => {
     offset,
   } = req.query;
   const seasons = await allSeasons(seriesId, limit, offset);
-  if (seasons.length === 0) {
+  if (!seasons) {
     return res.status(404).json({ error: 'Sería fannst ekki' });
   }
   return res.json(seasons);
 });
 
-router.post('/:seriesId/season', seasonValidations, showErrors, seasonSanitazions, requireAuthentication, checkUserIsAdmin, async (req, res) => {
-  const success = await addSeason(req.body);
+router.post('/:seriesId/season', multerMiddleWare, seasonValidations, showErrors, seasonSanitazions, requireAuthentication, checkUserIsAdmin, async (req, res) => {
+  const {
+    seriesId,
+  } = req.params;
+  const success = await addSeason(req.body, seriesId, req?.file?.path);
   if (success) {
     return res.json({ msg: 'Seríu bætt við' });
   }

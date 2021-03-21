@@ -111,7 +111,7 @@ export const seasonValidations = [
 
   check('seasonNum')
     .isInt()
-    .optional().withMessage('Númer seríu verður að vera heiltala'),
+    .withMessage('Númer seríu verður að vera heiltala'),
 
   check('releaseDate')
     .isDate()

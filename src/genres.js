@@ -1,9 +1,4 @@
-import express from 'express';
 import { query } from './db.js';
-import { requireAuthentication, checkUserIsAdmin } from './login.js';
-import { genreValidations, showErrors } from './validations.js';
-
-export const router = express.Router();
 
 export async function getGenres(limit = 10, offset = 0) {
   const q = 'SELECT * FROM TVgenre LIMIT $1 OFFSET $2;';
@@ -15,18 +10,6 @@ export async function getGenres(limit = 10, offset = 0) {
     return null;
   }
 }
-
-router.get('/', async (req, res) => {
-  const {
-    limit,
-    offset,
-  } = req.query;
-  const genres = await getGenres(limit, offset);
-  if (genres) {
-    return res.json(genres);
-  }
-  return res.status(500).json({ error: 'Villa að sækja genres' });
-});
 
 export async function addGenre(genre) {
   const q = `
@@ -42,14 +25,6 @@ export async function addGenre(genre) {
     return false;
   }
 }
-
-router.post('/', genreValidations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
-  const success = await addGenre(req.body.genre);
-  if (success) {
-    return res.json({ msg: 'Tókst að búa til tegund' });
-  }
-  return res.status(500).json({ msg: 'Villa við að búa til tegund' });
-});
 
 export async function getGenreByName(name) {
   const q = 'SELECT * FROM TVgenre WHERE typeName = $1;';

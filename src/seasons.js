@@ -1,7 +1,8 @@
-import { query } from './db.js';
+import { query, uploadImage } from './db.js';
+import fs from 'fs/promises';
 
 export async function allSeasons(seriesId, limit = 10, offset = 0) {
-  const q = 'SELECT * FROM TVseasons WHERE series_id = $1 LIMIT $2 OFFSET $3;';
+  const q = 'SELECT * FROM TVseasons WHERE seriesId = $1 LIMIT $2 OFFSET $3;';
   try {
     const result = await query(q, [seriesId, limit, offset]);
     return result.rows;
@@ -11,16 +12,22 @@ export async function allSeasons(seriesId, limit = 10, offset = 0) {
   }
 }
 
-export async function addSeason(body) {
+export async function addSeason(body, seriesId, imagePath) {
   const q = `INSERT INTO TVseasons (showName, seasonNum, releaseDate, about, photo, seriesId)
                VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;`;
+  var imageUrl;
+  if (imagePath) {
+    imageUrl = await uploadImage(imagePath);
+    await fs.rm(imagePath);
+  }
+  console.log(typeof(seriesId))
   const values = [
     body.showName,
     body.seasonNum,
     body.releaseDate,
     body.about,
-    body.photo,
-    body.seriesId];
+    imageUrl,
+    seriesId];
   try {
     await query(q, values);
     return true;
