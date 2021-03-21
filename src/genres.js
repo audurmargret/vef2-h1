@@ -1,9 +1,34 @@
 import { query } from './db.js';
+import express from 'express';
+import { requireAuthentication, checkUserIsAdmin } from "./login.js";
+import { genreValidations, showErrors } from './validations.js';
 
-export async function getGenres() {
-  const q = 'SELECT * FROM TVgenre;';
+export const router = express.Router();
+
+router.get('/', async (req, res) => {
+    const {
+        limit,
+        offset
+    } = req.query;
+    const genres = await getGenres(limit, offset);
+    if(genres) {
+        return res.json(genres);
+    }
+    return res.status(500).json({error: 'Villa að sækja genres'})
+});
+
+router.post('/', genreValidations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
+    const success = await addGenre(req.body.genre);
+    if (success) {
+        return res.json({ msg: 'Tókst að búa til tegund'});
+    }
+    return res.status(500).json({ msg: 'Villa við að búa til tegund'});
+});
+
+export async function getGenres(limit = 10, offset = 0) {
+  const q = 'SELECT * FROM TVgenre LIMIT $1 OFFSET $2;';
   try {
-    const result = await query(q);
+    const result = await query(q, [limit, offset]);
     return result.rows;
   } catch (e) {
     console.error('Gat ekki sótt genres', e);

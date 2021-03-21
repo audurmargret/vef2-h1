@@ -9,6 +9,7 @@ import { format } from 'date-fns';
 import { router as tvRouter } from './tv.js';
 import { router as adminRouter } from './admin.js';
 import passport from './login.js';
+import { router as genresRouter } from './genres.js';
 
 dotenv.config();
 
@@ -53,6 +54,7 @@ app.locals.formatDate = (str) => {
 
 app.use('/tv', tvRouter);
 app.use('/users', adminRouter);
+app.use('/genres', genresRouter);
 
 app.get('/', (req, res) => {
   res.json({

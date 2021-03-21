@@ -99,6 +99,7 @@ async function resetSerial() {
 }
 
 async function main() {
+  console.info('Set inn local myndir á cloudinary')
   await allImages();
   console.info(`Set upp gagnagrunn á ${connectionString}`);
   // droppa töflu ef til
@@ -108,7 +109,7 @@ async function main() {
   await query('DROP TABLE IF EXISTS TVseasons cascade');
   await query('DROP TABLE IF EXISTS episodes cascade');
   await query('DROP TABLE IF EXISTS users cascade');
-  await query('DROP TABLE IF EXISTS usersConnect');
+  await query('DROP TABLE IF EXISTS userConnect');
   console.info('Töflum eytt');
 
   // búa til töflu út frá skema

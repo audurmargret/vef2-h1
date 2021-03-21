@@ -56,11 +56,15 @@ import {
 export const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const series = await findAllSeries();
-  if (series) {
-    return res.json(series);
-  }
-  return res.status(500).json({ error: 'Villa við að sækja seríur' });
+    const {
+        limit,
+        offset
+    } = req.query;
+    const series = await findAllSeries(limit, offset);
+    if (series){
+        return res.json(series);
+    }
+    return res.status(500).json({error: 'Villa við að sækja seríur'})
 });
 
 router.post('/', seriesValidations, showErrors, seriesSanitazions, requireAuthentication, checkUserIsAdmin, async (req, res) => {
@@ -69,22 +73,6 @@ router.post('/', seriesValidations, showErrors, seriesSanitazions, requireAuthen
     return res.json({ msg: 'Bætti við þáttaröð' });
   }
   return res.status(500).json({ error: 'Villa við að bæta við þáttaröð' });
-});
-
-router.get('/genres', async (req, res) => {
-  const genres = await getGenres();
-  if (genres) {
-    return res.json(genres);
-  }
-  return res.status(500).json({ error: 'Villa að sækja genres' });
-});
-
-router.post('/genres', genreValidations, showErrors, genreSanitazions, requireAuthentication, checkUserIsAdmin, async (req, res) => {
-  const success = await addGenre(req.body.genre);
-  if (success) {
-    return res.json({ msg: 'Tókst að búa til tegund' });
-  }
-  return res.status(500).json({ msg: 'Villa við að búa til tegund' });
 });
 
 router.get('/:seriesId', halfRequireAuthentication, async (req, res) => {
@@ -204,14 +192,18 @@ router.delete('/:seriesId/state', requireAuthentication, (req, res) => {
 });
 
 router.get('/:seriesId/season', async (req, res) => {
-  const {
-    seriesId,
-  } = req.params;
-  const seasons = await allSeasons(seriesId);
-  if (seasons.length === 0) {
-    return res.status(404).json({ error: 'Sería fannst ekki' });
-  }
-  return res.json(seasons);
+    const {
+        seriesId
+    } = req.params;
+    const {
+        limit,
+        offset
+    } = req.query;
+    const seasons = await allSeasons(seriesId, limit, offset);
+    if(seasons.length === 0) {
+        return res.status(404).json({error: 'Sería fannst ekki'})
+    }
+    return res.json(seasons);
 });
 
 router.post('/:seriesId/season', seasonValidations, showErrors, seasonSanitazions, requireAuthentication, checkUserIsAdmin, async (req, res) => {
