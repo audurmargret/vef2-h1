@@ -12,6 +12,7 @@ import {
   createSeasons,
   createSeries,
 } from './db.js';
+import { rateSeries, stateSeries } from './series.js';
 
 dotenv.config();
 
@@ -98,6 +99,15 @@ async function resetSerial() {
   }
 }
 
+async function fakeUser() {
+  await stateSeries(11, 2, 'Hef horft');
+  await stateSeries(1, 2, 'Langar að horfa');
+  await stateSeries(18, 2, 'Er að horfa');
+
+  await rateSeries(11, 2, 4);
+  await rateSeries(15, 2, 5);
+}
+
 async function main() {
   console.info('Set inn local myndir á cloudinary');
   await allImages();
@@ -136,6 +146,8 @@ async function main() {
     await insertSeasons('./data/seasons.csv');
     await insertEpisodes('./data/episodes.csv');
     await resetSerial();
+
+    await fakeUser();
 
     console.info('Gögnum bætt við');
   } catch (e) {
