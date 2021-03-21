@@ -1,4 +1,5 @@
 import express from 'express';
+import validator from 'express-validator';
 import { 
     rateSeries,
     updateSeriesRating,
@@ -22,9 +23,23 @@ import {
 } from './seasons.js';
 import { addEpisode, findEpisode, deleteEpisode } from './episodes.js';
 import { checkUserIsAdmin, halfRequireAuthentication, requireAuthentication } from './login.js';
-import { getGenres, addGenre, getInfoGenres } from './genres.js'
-import { Result } from 'express-validator';
+import { getGenres, addGenre, getInfoGenres } from './genres.js';
+import { TV_validations as validations } from './validations.js';
+
 export const router = express.Router();
+
+const { validationResult } = validator;
+
+
+async function showErrors(req, res, next) {
+  const validation = validationResult(req);
+
+  if (!validation.isEmpty()) {
+    const errorMessages = validation.array();
+    return res.json({ errorMessages });
+  }
+  return next();
+}
 
 router.get('/', async (req, res) => {
     const series = await findAllSeries();
@@ -34,7 +49,7 @@ router.get('/', async (req, res) => {
     return res.status(500).json({error: 'Villa við að sækja seríur'})
 });
 
-router.post('/', requireAuthentication, checkUserIsAdmin, async (req, res) => {
+router.post('/', validations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
     const success = await addSeries(req.body);
     if (success) {
         return res.json({ msg: 'Bætti við þáttaröð'});
@@ -51,7 +66,6 @@ router.get('/genres', async (req, res) => {
 });
 
 router.post('/genres', requireAuthentication, checkUserIsAdmin, async (req, res) => {
-    console.log(req.body.genre)
     const success = await addGenre(req.body.genre);
     if (success) {
         return res.json({ msg: 'Tókst að búa til tegund'});

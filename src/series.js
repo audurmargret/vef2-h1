@@ -1,5 +1,7 @@
 import { query } from './db.js';
 
+const imageUrlMap = new Map();
+
 export async function findAllSeries() {
     const q = 'SELECT * FROM TVseries';
     try {

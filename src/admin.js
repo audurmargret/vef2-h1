@@ -6,12 +6,13 @@ import validator from 'express-validator';
 import { requireAuthentication, checkUserIsAdmin, jwtOptions, tokenLifeTime } from './login.js';
 import { comparePasswords, findById, findByUsername, findByEmail, updateAdmin, createUser, findAll, updatePassword, updateEmail } from './users.js';
 import { catchErrors } from './utils.js';
+import { user_validations as validations } from './validations.js'
 
 
 export const router = express.Router();
 router.use(express.json());
 
-const { check, validationResult } = validator;
+const { validationResult } = validator;
 
 async function index(req, res) {
   const {
@@ -112,20 +113,7 @@ async function userPATCH(req, res) {
   }
   return res.json('Gat ekki uppfært notanda');
 }
-async function validUsername(value) {
-  const id = (await findByUsername(value));
-  if (id) {
-    throw new Error('Notendanfn þegar skráð');
-  }
-  return true;
-}
-async function validEmail(value) {
-  const id = (await findByEmail(value));
-  if (id) {
-    throw new Error('Tölvupóstfang þegar skráð');
-  }
-  return true;
-}
+
 async function showErrors(req, res, next) {
   const validation = validationResult(req);
 
@@ -136,32 +124,6 @@ async function showErrors(req, res, next) {
   return next();
 }
 
-// Öll validations
-const validations = [
-  check('username')
-    .isLength({ min: 1 })
-    .withMessage('Notendanafn má ekki vera tómt'),
-
-  check('email')
-    .isLength({ min: 1 })
-    .withMessage('Tölvupóstfang má ekki vera tómt'),
-
-  check('email')
-    .isEmail()
-    .withMessage('Ógilt netfang'),
-
-  check('password')
-    .isLength({ min: 1 })
-    .withMessage('Lykilorð má ekki vera tómt'),
-  
-  check('username')
-    .blacklist('-').custom((val) => validUsername(val))
-    .withMessage('Notendanafn er ekki laust'),
-  
-  check('email')
-    .blacklist('-').custom((val) => validEmail(val))
-    .withMessage('Tölvupóstfang er ekki laust'),
-];
 
 router.get('/', requireAuthentication, checkUserIsAdmin, catchErrors(index));
 router.get('/me', requireAuthentication, catchErrors(meGET));
