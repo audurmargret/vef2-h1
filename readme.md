@@ -66,7 +66,7 @@
 * `/tv/:id`
 
 ## Heroku
-* Linkur á heroku: https://vef2-h1-h15.herokuapp.com 
+* Linkur á heroku: https://vef2-h1-h15.herokuapp.com
 
 ## Nemendur
 * Arnþór Guðmundsson, arg49@hi.is
