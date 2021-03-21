@@ -113,8 +113,8 @@ async function userPATCH(req, res) {
   return res.json('Gat ekki uppfært notanda');
 }
 async function validUsername(value) {
-  const id = (await findByUsername(value)).rowCount;
-  if (id > 0) {
+  const id = (await findByUsername(value));
+  if (id) {
     throw new Error('Notendanfn þegar skráð');
   }
   return true;
