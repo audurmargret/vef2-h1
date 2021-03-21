@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS TVseries(
   id serial primary key,
-  show_name varchar(128) not null,
-  release_date date,
-  still_going boolean,
+  showName varchar(128) not null,
+  releaseDate date,
+  stillGoing boolean,
   tagline varchar(128),
   photo varchar(128),
   about text,
@@ -13,37 +13,37 @@ CREATE TABLE IF NOT EXISTS TVseries(
 
 CREATE TABLE IF NOT EXISTS TVgenre(
   id serial primary key,
-  type_name varchar(128) not null unique
+  typeName varchar(128) not null unique
 );
 
 CREATE TABLE IF NOT EXISTS TVconnect(
   id serial primary key,
-  tvseries_id integer,
-  tvgenre_id integer,
-  foreign key (tvseries_id) references TVseries (id) on delete cascade,
-  foreign key (tvgenre_id) references TVgenre (id) on delete cascade
+  tvseriesId integer,
+  tvgenreId integer,
+  foreign key (tvseriesId) references TVseries (id) on delete cascade,
+  foreign key (tvgenreId) references TVgenre (id) on delete cascade
 );
 
 CREATE TABLE IF NOT EXISTS TVseasons(
 	id serial primary key,
-	show_name varchar(128) not null,
-	season_num integer,
-	release_date date,
+	showName varchar(128) not null,
+	seasonNum integer,
+	releaseDate date,
 	about text,
 	photo varchar(128),
-	series_id integer,
-	foreign key (series_id) references TVseries(id) on delete cascade
+	seriesId integer,
+	foreign key (seriesId) references TVseries(id) on delete cascade
 );
 
 CREATE TABLE IF NOT EXISTS episodes(
 	id serial primary key,
-	episode_name varchar(128) not null,
-	epi_num integer,
-	release_date date,
+	episodeName varchar(128) not null,
+	epiNum integer,
+	releaseDate date,
 	about text,
 	season integer,
-	series_id integer,
-	foreign key (series_id) references TVseries(id) on delete cascade
+	seriesId integer,
+	foreign key (seriesId) references TVseries(id) on delete cascade
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -56,11 +56,11 @@ CREATE TABLE IF NOT EXISTS users (
 
 CREATE TABLE IF NOT EXISTS userConnect (
 	id serial primary key,
-	series_id integer,
-	user_id integer,
+	seriesId integer,
+	userId integer,
 	status varchar(64),
 	rating integer,
-	foreign key (series_id) references TVseries(id) on delete cascade,
-	foreign key (user_id) references users(id) on delete cascade
+	foreign key (seriesId) references TVseries(id) on delete cascade,
+	foreign key (userId) references users(id) on delete cascade
 );
 

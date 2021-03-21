@@ -14,7 +14,7 @@ export async function comparePasswords(password, hash) {
 export async function findAll(limit = 10, offset = 0) {
   const q = 'SELECT * FROM users LIMIT $1 OFFSET $2;';
   try {
-    const result = await query(q, [ limit, offset ]);
+    const result = await query(q, [limit, offset]);
     return result.rows;
   } catch (e) {
     console.error('Gat ekki fundið alla notendur');
@@ -22,7 +22,7 @@ export async function findAll(limit = 10, offset = 0) {
   }
 }
 export async function findByUsername(username) {
-  const q = `SELECT * FROM users WHERE username = $1`;
+  const q = 'SELECT * FROM users WHERE username = $1';
   try {
     const result = await query(q, [username]);
     if (result.rowCount === 1) {
@@ -37,11 +37,11 @@ export async function findByUsername(username) {
 }
 
 export async function findById(id) {
-  const q = `SELECT * FROM users WHERE id = $1`;
+  const q = 'SELECT * FROM users WHERE id = $1';
 
   try {
     const result = await query(q, [id]);
-    //console.log("ID", result)
+    // console.log("ID", result)
     if (result.rowCount === 1) {
       return result.rows[0];
     }
@@ -52,7 +52,7 @@ export async function findById(id) {
   return null;
 }
 export async function findByEmail(email) {
-  const q = `SELECT * FROM users WHERE email = $1`;
+  const q = 'SELECT * FROM users WHERE email = $1';
 
   try {
     const result = await query(q, [email]);
@@ -69,35 +69,35 @@ export async function findByEmail(email) {
 export async function updateAdmin(userID) {
   const user = await findById(userID);
   user.admin = !user.admin;
-  const q = `UPDATE users SET admin = $1 WHERE id = $2`;
+  const q = 'UPDATE users SET admin = $1 WHERE id = $2';
   const values = [user.admin, userID];
   try {
     const result = await query(q, values);
     return true;
-  } catch(e) {
+  } catch (e) {
     console.error('Gat ekki uppfært admin réttindi');
   }
   return false;
 }
 export async function updateEmail(userID, email) {
-  const q = `UPDATE users SET email = $1 WHERE id = $2`;
+  const q = 'UPDATE users SET email = $1 WHERE id = $2';
   const values = [email, userID];
   try {
     const result = await query(q, values);
     return true;
-  } catch(e) {
+  } catch (e) {
     console.error('Gat ekki uppfært tölvupóstfang');
   }
   return false;
 }
 export async function updatePassword(userID, password) {
   const hashedPassword = await bcrypt.hash(password, 11);
-  const q = `UPDATE users SET password = $1 WHERE id = $2`;
+  const q = 'UPDATE users SET password = $1 WHERE id = $2';
   const values = [hashedPassword, userID];
   try {
     const result = await query(q, values);
     return true;
-  } catch(e) {
+  } catch (e) {
     console.error('Gat ekki uppfært lykilorð');
   }
   return false;

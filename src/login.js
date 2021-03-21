@@ -1,25 +1,25 @@
 import passport from 'passport';
 import {
-    Strategy as StrategyJWT, ExtractJwt,
-  } from 'passport-jwt';
+  Strategy as StrategyJWT, ExtractJwt,
+} from 'passport-jwt';
 import { findByUsername, findById } from './users.js';
 
 const {
-    JWT_SECRET: jwtSecret,
-    TOKEN_LIFETIME: tokenLifeTime = 60 * 60 * 24 * 7
+  JWT_SECRET: jwtSecret,
+  TOKEN_LIFETIME: tokenLifeTime = 60 * 60 * 24 * 7,
 } = process.env;
 
 export { tokenLifeTime };
 
 if (!jwtSecret) {
-    console.error('Vantar .env gildi');
-    process.exit(1);
+  console.error('Vantar .env gildi');
+  process.exit(1);
 }
 
 export const jwtOptions = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: jwtSecret,
-  };
+  jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+  secretOrKey: jwtSecret,
+};
 
 /**
  * Athugar hvort username og password sé til í notandakerfi.
@@ -38,7 +38,6 @@ async function strat(data, done) {
       return done(null, false);
     }
     return done(null, user);
-
   } catch (err) {
     console.error(err);
     return done(err);
@@ -66,7 +65,7 @@ export function halfRequireAuthentication(req, res, next) {
   passport.authenticate(
     'jwt',
     { session: false },
-    (err, user, info) => {
+    (err, user) => {
       if (err) {
         return next(err);
       }
