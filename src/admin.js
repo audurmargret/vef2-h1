@@ -6,13 +6,12 @@ import validator from 'express-validator';
 import { requireAuthentication, checkUserIsAdmin, jwtOptions, tokenLifeTime } from './login.js';
 import { comparePasswords, findById, findByUsername, findByEmail, updateAdmin, createUser, findAll, updatePassword, updateEmail } from './users.js';
 import { catchErrors } from './utils.js';
-import { user_validations as validations } from './validations.js'
+import { user_validations as validations, showErrors } from './validations.js'
 
 
 export const router = express.Router();
 router.use(express.json());
 
-const { validationResult } = validator;
 
 async function index(req, res) {
   const {
@@ -113,17 +112,6 @@ async function userPATCH(req, res) {
   }
   return res.json('Gat ekki uppfært notanda');
 }
-
-async function showErrors(req, res, next) {
-  const validation = validationResult(req);
-
-  if (!validation.isEmpty()) {
-    const errorMessages = validation.array();
-    return res.json({ errorMessages });
-  }
-  return next();
-}
-
 
 router.get('/', requireAuthentication, checkUserIsAdmin, catchErrors(index));
 router.get('/me', requireAuthentication, catchErrors(meGET));
