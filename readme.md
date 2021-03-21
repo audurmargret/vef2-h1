@@ -1,18 +1,9 @@
-
-## README
-
-Í rót verkefnis skal vera `README.md` skjal sem tilgreinir:
-
-* Upplýsingar um hvernig setja skuli upp verkefnið
-* Dæmi um köll í vefþjónustu
-* Innskráning fyrir `admin` stjórnanda ásamt lykilorði
-* Innskráning fyrir almennan notanda ásamt lykilorði
-* Nöfn og notendanöfn allra í hóp
-
+# Hópverkefni 1 - Vefforritun 2
 
 ## Uppsetning
-# Afrita skal þessa skrá í .env og setja rétta slóð á gagnagrunn
-# DATABASE_URL=postgres://<USER>:<PASS>@localhost/<DATABASENAME>
+* npm install
+* npm run setup
+* npm run dev
 
 ## Notendur
 ### Admin notandi
@@ -22,6 +13,9 @@
 ### Venjulegur notandi
 * notendanafn: notandi
 * lykilorð: 321
+
+## Dæmi um köll í vefþjónustu
+* 
 
 ## Nemendur
 * Arnþór Guðmundsson, arg49@hi.is
