@@ -8,7 +8,7 @@
   },
   "scripts": {
     "dev": "nodemon ./src/app.js",
-    "test": "eslint ./src",
+    "test": "eslint --fix ./src",
     "start": "node ./src/app.js",
     "setup": "node ./src/setup.js"
   },
@@ -26,6 +26,7 @@
     "bcrypt": "^5.0.1",
     "cloudinary": "^1.25.0",
     "csv-parser": "^3.0.0",
+    "date-fns": "^2.19.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-session": "^1.17.1",

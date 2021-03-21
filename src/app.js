@@ -1,4 +1,3 @@
-
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -9,7 +8,7 @@ import { format } from 'date-fns';
 
 import { router as tvRouter } from './tv.js';
 import { router as adminRouter } from './admin.js';
-import passport, { requireAuthentication } from './login.js';
+import passport from './login.js';
 
 dotenv.config();
 
@@ -29,7 +28,7 @@ const app = express();
 const path = dirname(fileURLToPath(import.meta.url));
 
 app.use(express.static(join(path, '../public')));
-app.use(express.json())
+app.use(express.json());
 
 app.use(session({
   secret: sessionSecret,
@@ -38,7 +37,7 @@ app.use(session({
   maxAge: 20 * 1000, // 20 sek
 }));
 
-app.use(passport.initialize())
+app.use(passport.initialize());
 
 app.locals.formatDate = (str) => {
   let date = '';
@@ -56,9 +55,18 @@ app.use('/tv', tvRouter);
 app.use('/users', adminRouter);
 
 app.get('/', (req, res) => {
-    res.json({"tv":{"series":{"href":"/tv","methods":["GET","POST"]},"serie":{"href":"/tv/{id}","methods":["GET","PATCH","DELETE"]},"rate":{"href":"/tv/{id}/rate","methods":["POST","PATCH","DELETE"]},"state":{"href":"/tv/{id}/state","methods":["POST","PATCH","DELETE"]}},"seasons":{"seasons":{"href":"/tv/{id}/season","methods":["GET","POST"]},"season":{"href":"/tv/{id}/season/{season}","methods":["GET","DELETE"]}},"episodes":{"episodes":{"href":"/tv/{id}/season/{season}/episode","methods":["POST"]},"episode":{"href":"/tv/{id}/season/{season}/episode/{episode}","methods":["GET","DELETE"]}},"genres":{"genres":{"href":"/genres","methods":["GET","POST"]}},"users":{"users":{"href":"/users","methods":["GET"]},"user":{"href":"/users/{id}","methods":["GET","PATCH"]},"register":{"href":"/users/register","methods":["POST"]},"login":{"href":"/users/login","methods":["POST"]},"me":{"href":"/users/me","methods":["GET","PATCH"]}}});
-})
-
+  res.json({
+    tv: {
+      series: { href: '/tv', methods: ['GET', 'POST'] }, serie: { href: '/tv/{id}', methods: ['GET', 'PATCH', 'DELETE'] }, rate: { href: '/tv/{id}/rate', methods: ['POST', 'PATCH', 'DELETE'] }, state: { href: '/tv/{id}/state', methods: ['POST', 'PATCH', 'DELETE'] },
+    },
+    seasons: { seasons: { href: '/tv/{id}/season', methods: ['GET', 'POST'] }, season: { href: '/tv/{id}/season/{season}', methods: ['GET', 'DELETE'] } },
+    episodes: { episodes: { href: '/tv/{id}/season/{season}/episode', methods: ['POST'] }, episode: { href: '/tv/{id}/season/{season}/episode/{episode}', methods: ['GET', 'DELETE'] } },
+    genres: { genres: { href: '/genres', methods: ['GET', 'POST'] } },
+    users: {
+      users: { href: '/users', methods: ['GET'] }, user: { href: '/users/{id}', methods: ['GET', 'PATCH'] }, register: { href: '/users/register', methods: ['POST'] }, login: { href: '/users/login', methods: ['POST'] }, me: { href: '/users/me', methods: ['GET', 'PATCH'] },
+    },
+  });
+});
 
 /**
  * Middleware sem sér um 404 villur.
