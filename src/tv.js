@@ -20,9 +20,21 @@ import {
   findSeason,
   deleteSeason,
 } from './seasons.js';
-import { addEpisode, findEpisode, deleteEpisode } from './episodes.js';
-import { checkUserIsAdmin, halfRequireAuthentication, requireAuthentication } from './login.js';
-import { getGenres, addGenre, getInfoGenres } from './genres.js';
+import { 
+  addEpisode, 
+  findEpisode, 
+  deleteEpisode
+ } from './episodes.js';
+import { 
+  checkUserIsAdmin, 
+  halfRequireAuthentication, 
+  requireAuthentication
+ } from './login.js';
+import { 
+  getGenres, 
+  addGenre, 
+  getInfoGenres
+ } from './genres.js';
 import {
   seriesValidations,
   genreValidations,

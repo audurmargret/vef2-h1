@@ -5,7 +5,12 @@ import pg from 'pg';
 import bcrypt from 'bcrypt';
 import csv from 'csv-parser';
 import {
-  allImages, connectGenre, createEpisodes, createGenre, createSeasons, createSeries,
+  allImages, 
+  connectGenre, 
+  createEpisodes, 
+  createGenre, 
+  createSeasons, 
+  createSeries,
 } from './db.js';
 
 dotenv.config();
@@ -130,7 +135,6 @@ async function main() {
     await insertSeasons('./data/seasons.csv');
     await insertEpisodes('./data/episodes.csv');
     await resetSerial();
-    //console.log(csvSeasons);
 
     console.info('Gögnum bætt við');
   } catch (e) {

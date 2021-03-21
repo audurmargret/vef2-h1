@@ -2,7 +2,10 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 
 import {
-  requireAuthentication, checkUserIsAdmin, jwtOptions, tokenLifeTime,
+  requireAuthentication, 
+  checkUserIsAdmin, 
+  jwtOptions, 
+  tokenLifeTime,
 } from './login.js';
 import {
   comparePasswords,
