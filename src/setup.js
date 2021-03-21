@@ -82,6 +82,17 @@ async function insertEpisodes(file) {
   });
 }
 
+async function resetSerial() {
+  const q = `
+  SELECT setval('tvseries_id_seq', 20, true);
+  `;
+  try {
+    await query(q);
+  } catch(e) {
+    console.info('Villa við að breyta serial', e);
+  }
+}
+
 async function main() {
   await allImages();
   console.info(`Set upp gagnagrunn á ${connectionString}`);
@@ -118,7 +129,8 @@ async function main() {
     await insertSeries('./data/series.csv');
     await insertSeasons('./data/seasons.csv');
     await insertEpisodes('./data/episodes.csv');
-    // console.log(csvSeasons);
+    await resetSerial();
+    //console.log(csvSeasons);
 
     console.info('Gögnum bætt við');
   } catch (e) {
