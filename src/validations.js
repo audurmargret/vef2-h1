@@ -39,7 +39,6 @@ async function validState(value) {
   return true;
 }
 
-
 export const seriesValidations = [
   check('showName')
     .isLength({ min: 1 })
@@ -54,7 +53,7 @@ export const seriesValidations = [
     .withMessage('stillGoing verður að vera true eða false'),
 
   check('url')
-    .optional().custom((val) => validUrl(val))
+    .optional().isUrl()
     .withMessage('Ógildur linkur'),
 ];
 

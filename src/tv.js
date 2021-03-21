@@ -20,24 +20,21 @@ import {
   findSeason,
   deleteSeason,
 } from './seasons.js';
-import { 
-  addEpisode, 
-  findEpisode, 
-  deleteEpisode
- } from './episodes.js';
-import { 
-  checkUserIsAdmin, 
-  halfRequireAuthentication, 
-  requireAuthentication
- } from './login.js';
-import { 
-  getGenres, 
-  addGenre, 
-  getInfoGenres
- } from './genres.js';
+import {
+  addEpisode,
+  findEpisode,
+  deleteEpisode,
+} from './episodes.js';
+import {
+  checkUserIsAdmin,
+  halfRequireAuthentication,
+  requireAuthentication,
+} from './login.js';
+import {
+  getInfoGenres,
+} from './genres.js';
 import {
   seriesValidations,
-  genreValidations,
   showErrors,
   rateValidations,
   stateValidations,
@@ -46,7 +43,6 @@ import {
 } from './validations.js';
 import {
   seriesSanitazions,
-  genreSanitazions,
   rateSanitazions,
   stateSanitazions,
   seasonSanitazions,
@@ -56,15 +52,15 @@ import {
 export const router = express.Router();
 
 router.get('/', async (req, res) => {
-    const {
-        limit,
-        offset
-    } = req.query;
-    const series = await findAllSeries(limit, offset);
-    if (series){
-        return res.json(series);
-    }
-    return res.status(500).json({error: 'Villa við að sækja seríur'})
+  const {
+    limit,
+    offset,
+  } = req.query;
+  const series = await findAllSeries(limit, offset);
+  if (series) {
+    return res.json(series);
+  }
+  return res.status(500).json({ error: 'Villa við að sækja seríur' });
 });
 
 router.post('/', seriesValidations, showErrors, seriesSanitazions, requireAuthentication, checkUserIsAdmin, async (req, res) => {
@@ -192,18 +188,18 @@ router.delete('/:seriesId/state', requireAuthentication, (req, res) => {
 });
 
 router.get('/:seriesId/season', async (req, res) => {
-    const {
-        seriesId
-    } = req.params;
-    const {
-        limit,
-        offset
-    } = req.query;
-    const seasons = await allSeasons(seriesId, limit, offset);
-    if(seasons.length === 0) {
-        return res.status(404).json({error: 'Sería fannst ekki'})
-    }
-    return res.json(seasons);
+  const {
+    seriesId,
+  } = req.params;
+  const {
+    limit,
+    offset,
+  } = req.query;
+  const seasons = await allSeasons(seriesId, limit, offset);
+  if (seasons.length === 0) {
+    return res.status(404).json({ error: 'Sería fannst ekki' });
+  }
+  return res.json(seasons);
 });
 
 router.post('/:seriesId/season', seasonValidations, showErrors, seasonSanitazions, requireAuthentication, checkUserIsAdmin, async (req, res) => {

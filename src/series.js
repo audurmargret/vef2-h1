@@ -3,14 +3,14 @@ import { query } from './db.js';
 const imageUrlMap = new Map();
 
 export async function findAllSeries(limit = 10, offset = 0) {
-    const q = 'SELECT * FROM TVseries LIMIT $1 OFFSET $2';
-    try {
-        const result = await query(q, [limit, offset]);
-        return result.rows;
-    } catch (e) {
-        console.error('Gat ekki sótt þáttaraðir', e);
-        return null;
-    }
+  const q = 'SELECT * FROM TVseries LIMIT $1 OFFSET $2';
+  try {
+    const result = await query(q, [limit, offset]);
+    return result.rows;
+  } catch (e) {
+    console.error('Gat ekki sótt þáttaraðir', e);
+    return null;
+  }
 }
 
 export async function findSeries(id) {

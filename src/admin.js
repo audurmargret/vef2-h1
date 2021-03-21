@@ -2,9 +2,9 @@ import express from 'express';
 import jwt from 'jsonwebtoken';
 
 import {
-  requireAuthentication, 
-  checkUserIsAdmin, 
-  jwtOptions, 
+  requireAuthentication,
+  checkUserIsAdmin,
+  jwtOptions,
   tokenLifeTime,
 } from './login.js';
 import {

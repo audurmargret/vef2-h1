@@ -5,11 +5,11 @@ import pg from 'pg';
 import bcrypt from 'bcrypt';
 import csv from 'csv-parser';
 import {
-  allImages, 
-  connectGenre, 
-  createEpisodes, 
-  createGenre, 
-  createSeasons, 
+  allImages,
+  connectGenre,
+  createEpisodes,
+  createGenre,
+  createSeasons,
   createSeries,
 } from './db.js';
 
@@ -93,13 +93,13 @@ async function resetSerial() {
   `;
   try {
     await query(q);
-  } catch(e) {
+  } catch (e) {
     console.info('Villa við að breyta serial', e);
   }
 }
 
 async function main() {
-  console.info('Set inn local myndir á cloudinary')
+  console.info('Set inn local myndir á cloudinary');
   await allImages();
   console.info(`Set upp gagnagrunn á ${connectionString}`);
   // droppa töflu ef til
