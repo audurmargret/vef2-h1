@@ -39,21 +39,22 @@ async function validState(value) {
   return true;
 }
 
+
 export const seriesValidations = [
   check('showName')
     .isLength({ min: 1 })
     .withMessage('Nafn má ekki vera tómt'),
 
   check('releaseDate')
-    .isDate()
+    .optional.isDate()
     .withMessage('Ógild dagsetning'),
 
   check('stillGoing')
-    .isBoolean()
+    .optional.isBoolean()
     .withMessage('stillGoing verður að vera true eða false'),
 
   check('url')
-    .isURL()
+    .optional.custom((val) => validUrl(val))
     .withMessage('Ógildur linkur'),
 ];
 
@@ -111,14 +112,14 @@ export const seasonValidations = [
 
   check('seasonNum')
     .isInt()
-    .withMessage('Númer seríu verður að vera heiltala'),
+    .optional.withMessage('Númer seríu verður að vera heiltala'),
 
   check('releaseDate')
     .isDate()
-    .withMessage('Ógild dagsetning'),
+    .optional.withMessage('Ógild dagsetning'),
 
   check('seriesId')
-    .isInt()
+    .optional.isInt()
     .withMessage('Series ID verður að vera heiltala'),
 ];
 
@@ -128,19 +129,19 @@ export const episodeValidations = [
     .withMessage('Nafn má ekki vera tómt'),
 
   check('epiNum')
-    .isInt()
+    .optional.isInt()
     .withMessage('Númer þátts verður að vera heiltala'),
 
   check('releaseDate')
-    .isDate()
+    .optional.isDate()
     .withMessage('Ógild dagsetning'),
 
   check('season')
-    .isInt()
+    .optional.isInt()
     .withMessage('Sería verður að vera heiltala'),
 
   check('seriesId')
-    .isInt()
+    .optional.isInt()
     .withMessage('Series ID verður að vera heiltala'),
 
 ];
