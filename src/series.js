@@ -120,35 +120,8 @@ export async function userconnectExist(seriesId, userID) {
         SELECT * FROM userConnect WHERE seriesId = $1 AND userId = $2
     `;
   const result = await query(q, [seriesId, userID]);
-  console.log(Object.keys(result.rows).length);
   if (Object.keys(result.rows).length === 0) return false;
   return true;
-}
-
-export async function rateSeries(id, user, rating) {
-  if (await userconnectExist(id, user)) {
-    console.log('hérnaaa');
-    updateSeriesRating(id, user, rating);
-  } else {
-    const q = `
-        INSERT INTO 
-          userConnect (
-            seriesId,
-            userId,
-            rating)
-          VALUES ($1, $2, $3)
-        `;
-    try {
-      await query(q, [
-        id,
-        user,
-        rating,
-      ]);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
 }
 
 export async function updateSeriesRating(id, user, rating) {
@@ -161,6 +134,30 @@ export async function updateSeriesRating(id, user, rating) {
       rating,
       id,
       user,
+    ]);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+export async function rateSeries(id, user, rating) {
+  if (await userconnectExist(id, user)) {
+    return updateSeriesRating(id, user, rating);
+  }
+  const q = `
+        INSERT INTO 
+          userConnect (
+            seriesId,
+            userId,
+            rating)
+          VALUES ($1, $2, $3)
+        `;
+  try {
+    await query(q, [
+      id,
+      user,
+      rating,
     ]);
     return true;
   } catch (e) {
@@ -184,33 +181,6 @@ export async function deleteSeriesRating(id, user) {
   }
 }
 
-export async function stateSeries(id, user, state) {
-  if (await userconnectExist(id, user)) {
-    console.log('hér');
-    updateSeriesState(id, user, state);
-  } else {
-    const q = `
-        INSERT INTO 
-          userConnect (
-            seriesId,
-            userId,
-            status)
-          VALUES ($1, $2, $3)
-        `;
-    try {
-      await query(q, [
-        id,
-        user,
-        state,
-      ]);
-      return true;
-    } catch (e) {
-      console.error('Gat ekki bætt við stöðu', e);
-      return false;
-    }
-  }
-}
-
 export async function updateSeriesState(id, user, state) {
   const q = `
         UPDATE userConnect SET status = $1 
@@ -224,6 +194,31 @@ export async function updateSeriesState(id, user, state) {
     ]);
     return true;
   } catch (e) {
+    return false;
+  }
+}
+
+export async function stateSeries(id, user, state) {
+  if (await userconnectExist(id, user)) {
+    return updateSeriesState(id, user, state);
+  }
+  const q = `
+        INSERT INTO 
+          userConnect (
+            seriesId,
+            userId,
+            status)
+          VALUES ($1, $2, $3)
+        `;
+  try {
+    await query(q, [
+      id,
+      user,
+      state,
+    ]);
+    return true;
+  } catch (e) {
+    console.error('Gat ekki bætt við stöðu', e);
     return false;
   }
 }
@@ -268,10 +263,10 @@ export async function getInfo(id) {
 
   try {
     const result = await query(q, [id]);
-    for (let i = 0; i < result.rowCount; i++) {
+    for (let i = 0; i < result.rowCount; i += 1) {
       sum += result.rows[i].rating;
       if (result.rows[i].rating !== null) {
-        counter++;
+        counter += 1;
       }
     }
     const avg = sum / counter;

@@ -39,7 +39,7 @@ async function validState(value) {
   return true;
 }
 
-export const series_validations = [
+export const seriesValidations = [
   check('showName')
     .isLength({ min: 1 })
     .withMessage('Nafn má ekki vera tómt'),
@@ -57,7 +57,7 @@ export const series_validations = [
     .withMessage('Ógildur linkur'),
 ];
 
-export const genre_validations = [
+export const genreValidations = [
   check('typeName')
     .isLength({ min: 1 })
     .withMessage('Nafn má ekki vera tómt'),
@@ -67,18 +67,18 @@ export const genre_validations = [
     .withMessage('Genre er þegar skráð'),
 ];
 
-export const rate_validations = [
+export const rateValidations = [
   check('rate')
     .custom((val) => validRate(val))
     .withMessage('Einkunn verður að vera heiltala frá og með 0 til og með 5'),
 ];
 
-export const state_validations = [
+export const stateValidations = [
   check('status')
     .custom((val) => validState(val))
     .withMessage('Staða verður að vera "Langar að horfa", "Er að horfa" eða "Hef horft"'),
 ];
-export const user_validations = [
+export const userValidations = [
   check('username')
     .isLength({ min: 1 })
     .withMessage('Notendanafn má ekki vera tómt'),
@@ -104,7 +104,7 @@ export const user_validations = [
     .withMessage('Tölvupóstfang er ekki laust'),
 ];
 
-export const season_validations = [
+export const seasonValidations = [
   check('showName')
     .isLength({ min: 1 })
     .withMessage('Nafn má ekki vera tómt'),
@@ -122,7 +122,7 @@ export const season_validations = [
     .withMessage('Series ID verður að vera heiltala'),
 ];
 
-export const episode_validations = [
+export const episodeValidations = [
   check('episodeName')
     .isLength({ min: 1 })
     .withMessage('Nafn má ekki vera tómt'),

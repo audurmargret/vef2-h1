@@ -1,5 +1,4 @@
 import express from 'express';
-import validator from 'express-validator';
 import {
   rateSeries,
   updateSeriesRating,
@@ -25,7 +24,13 @@ import { addEpisode, findEpisode, deleteEpisode } from './episodes.js';
 import { checkUserIsAdmin, halfRequireAuthentication, requireAuthentication } from './login.js';
 import { getGenres, addGenre, getInfoGenres } from './genres.js';
 import {
-  series_validations, genre_validations, showErrors, rate_validations, state_validations, season_validations, episode_validations,
+  seriesValidations,
+  genreValidations,
+  showErrors,
+  rateValidations,
+  stateValidations,
+  seasonValidations,
+  episodeValidations,
 } from './validations.js';
 
 export const router = express.Router();
@@ -38,7 +43,7 @@ router.get('/', async (req, res) => {
   return res.status(500).json({ error: 'Villa við að sækja seríur' });
 });
 
-router.post('/', series_validations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
+router.post('/', seriesValidations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
   const success = await addSeries(req.body);
   if (success) {
     return res.json({ msg: 'Bætti við þáttaröð' });
@@ -54,7 +59,7 @@ router.get('/genres', async (req, res) => {
   return res.status(500).json({ error: 'Villa að sækja genres' });
 });
 
-router.post('/genres', genre_validations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
+router.post('/genres', genreValidations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
   const success = await addGenre(req.body.genre);
   if (success) {
     return res.json({ msg: 'Tókst að búa til tegund' });
@@ -90,7 +95,7 @@ router.get('/:seriesId', halfRequireAuthentication, async (req, res) => {
   return res.json(series);
 });
 
-router.patch('/:seriesId', series_validations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
+router.patch('/:seriesId', seriesValidations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
   const {
     seriesId,
   } = req.params;
@@ -106,14 +111,13 @@ router.delete('/:seriesId', requireAuthentication, checkUserIsAdmin, async (req,
     seriesId,
   } = req.params;
   const success = await deleteSeries(seriesId);
-  console.log(success);
   if (success) {
     res.json({ msg: 'Eyddi þáttaröð' });
   }
   return res.status(500).json({ error: 'Villa við að eyða þáttaröð' });
 });
 
-router.post('/:seriesId/rate', rate_validations, showErrors, requireAuthentication, async (req, res) => {
+router.post('/:seriesId/rate', rateValidations, showErrors, requireAuthentication, async (req, res) => {
   const {
     seriesId,
   } = req.params;
@@ -124,7 +128,7 @@ router.post('/:seriesId/rate', rate_validations, showErrors, requireAuthenticati
   return res.status(500).json({ error: 'Villa við að gefa einkunn' });
 });
 
-router.patch('/:seriesId/rate', rate_validations, showErrors, requireAuthentication, (req, res) => {
+router.patch('/:seriesId/rate', rateValidations, showErrors, requireAuthentication, (req, res) => {
   const {
     seriesId,
   } = req.params;
@@ -146,11 +150,10 @@ router.delete('/:seriesId/rate', requireAuthentication, (req, res) => {
   return res.status(500).json({ error: 'Villa við að eyða einkunn' });
 });
 
-router.post('/:seriesId/state', state_validations, showErrors, requireAuthentication, async (req, res) => {
+router.post('/:seriesId/state', stateValidations, showErrors, requireAuthentication, async (req, res) => {
   const {
     seriesId,
   } = req.params;
-  console.log(req.body.state);
   const success = await stateSeries(seriesId, req.user.id, req.body.state);
   if (success) {
     return res.json({ msg: 'Tókst að setja stöðu' });
@@ -158,7 +161,7 @@ router.post('/:seriesId/state', state_validations, showErrors, requireAuthentica
   return res.status(500).json({ error: 'Villa við að setja stöðu' });
 });
 
-router.patch('/:seriesId/state', state_validations, showErrors, requireAuthentication, (req, res) => {
+router.patch('/:seriesId/state', stateValidations, showErrors, requireAuthentication, (req, res) => {
   const {
     seriesId,
   } = req.params;
@@ -191,7 +194,7 @@ router.get('/:seriesId/season', async (req, res) => {
   return res.json(seasons);
 });
 
-router.post('/:seriesId/season', season_validations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
+router.post('/:seriesId/season', seasonValidations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
   const success = await addSeason(req.body);
   if (success) {
     return res.json({ msg: 'Seríu bætt við' });
@@ -223,7 +226,7 @@ router.delete('/:seriesId/season/:seasonId', requireAuthentication, checkUserIsA
   return res.json({ error: 'Gat ekki eytt seríu' });
 });
 
-router.post('/:seriesId/season/:seasonId/episode', episode_validations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
+router.post('/:seriesId/season/:seasonId/episode', episodeValidations, showErrors, requireAuthentication, checkUserIsAdmin, async (req, res) => {
   const {
     seriesId,
     seasonId,

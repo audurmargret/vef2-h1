@@ -15,7 +15,7 @@ import {
   updateEmail,
 } from './users.js';
 import { catchErrors } from './utils.js';
-import { user_validations as validations, showErrors } from './validations.js';
+import { userValidations as validations, showErrors } from './validations.js';
 
 export const router = express.Router();
 router.use(express.json());
@@ -104,7 +104,7 @@ async function userPATCH(req, res) {
     id: userID,
   } = req.params;
 
-  if (parseInt(userID) === req.user.id) {
+  if (parseInt(userID, 10) === req.user.id) {
     return res.json('Ekki hægt að breyta sjálfum sér');
   }
 

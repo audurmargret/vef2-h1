@@ -72,7 +72,7 @@ export async function updateAdmin(userID) {
   const q = 'UPDATE users SET admin = $1 WHERE id = $2';
   const values = [user.admin, userID];
   try {
-    const result = await query(q, values);
+    await query(q, values);
     return true;
   } catch (e) {
     console.error('Gat ekki uppfært admin réttindi');
@@ -83,7 +83,7 @@ export async function updateEmail(userID, email) {
   const q = 'UPDATE users SET email = $1 WHERE id = $2';
   const values = [email, userID];
   try {
-    const result = await query(q, values);
+    await query(q, values);
     return true;
   } catch (e) {
     console.error('Gat ekki uppfært tölvupóstfang');
@@ -95,7 +95,7 @@ export async function updatePassword(userID, password) {
   const q = 'UPDATE users SET password = $1 WHERE id = $2';
   const values = [hashedPassword, userID];
   try {
-    const result = await query(q, values);
+    await query(q, values);
     return true;
   } catch (e) {
     console.error('Gat ekki uppfært lykilorð');

@@ -63,7 +63,7 @@ export async function uploadImage(imageId) {
       }, (error, result) => {
         if (error) {
           console.error(`Villa við að hlaða upp mynd: ${error}`);
-          reject(null);
+          reject(error);
         } else {
           resolve(result.url);
         }
@@ -72,10 +72,10 @@ export async function uploadImage(imageId) {
   });
 }
 
-async function getLocalImages(path) {
+async function getLocalImages(localPath) {
   let localImages = [];
   try {
-    localImages = readdir(path);
+    localImages = readdir(localPath);
   } catch (e) {
     console.error(e);
   }
@@ -136,7 +136,7 @@ export async function createGenre(data) {
   const genres = data.genres.split(',');
   try {
     for (let i = 0; i < genres.length; i += 1) {
-      await query(q, [
+      await query(q, [ // eslint-disable-line
         genres[i],
       ]);
     }
@@ -164,16 +164,16 @@ export async function connectGenre(data) {
           VALUES ($1, $2);
     `;
   const genres = data.genres.split(',');
-  const genre_id = [];
+  const genreId = [];
   for (let i = 0; i < genres.length; i += 1) {
-    const id = await getGenreId(genres[i]);
-    genre_id.push(id);
+    const id = await getGenreId(genres[i]); // eslint-disable-line
+    genreId.push(id);
   }
   try {
     for (let i = 0; i < genres.length; i += 1) {
-      await query(q, [
+      await query(q, [ // eslint-disable-line
         data.id,
-        genre_id[i],
+        genreId[i],
       ]);
     }
   } catch (e) {
