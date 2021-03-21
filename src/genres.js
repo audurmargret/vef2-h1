@@ -14,7 +14,7 @@ export async function getGenres() {
 }
 
 export async function getInfoGenres(id) {
-    const q = `SELECT typeName FROM TVgenre WHERE id IN (SELECT tvgenre_id FROM TVconnect WHERE tvseries_id = $1);`
+    const q = `SELECT type_name FROM TVgenre WHERE id IN (SELECT tvgenre_id FROM TVconnect WHERE tvseries_id = $1);`
     try{
         const result = await query(q, [id]);
         return result.rows;
@@ -27,7 +27,7 @@ export async function getInfoGenres(id) {
 export async function addGenre(genre) {
     const q = `
     INSERT INTO
-        TVgenre (typeName)
+        TVgenre (type_name)
         VALUES ($1)
     `;
     try {

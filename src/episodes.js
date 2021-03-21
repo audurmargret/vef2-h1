@@ -4,18 +4,18 @@ import { findSeason } from './seasons.js';
 export async function addEpisode(seriesId, seasonId, data) {
     const q = `
     INSERT INTO 
-        episodes (episodeName, epi_num, releaseDate, about, season, series_id)
+        episodes (episode_name, epi_num, release_date, about, season, series_id)
     VALUES ($1, $2, $3, $4, $5, $6)
     `;
     const season_numb = await findSeason(seriesId, seasonId);
-    let date = data.releaseDate;
+    let date = data.release_date;
     if (date == '') {
         date = null;
     }
     console.log("season_num", season_numb.season_num)
     try {
         await query(q, [
-            data.episodeName,
+            data.episode_name,
             data.epi_num,
             date,
             data.about,

@@ -1,8 +1,8 @@
 CREATE TABLE IF NOT EXISTS TVseries(
   id serial primary key,
-  showName varchar(128) not null,
-  releaseDate date,
-  stillGoing boolean,
+  show_name varchar(128) not null,
+  release_date date,
+  still_going boolean,
   tagline varchar(128),
   photo varchar(128),
   about text,
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS TVseries(
 
 CREATE TABLE IF NOT EXISTS TVgenre(
   id serial primary key,
-  typeName varchar(128) not null unique
+  type_name varchar(128) not null unique
 );
 
 CREATE TABLE IF NOT EXISTS TVconnect(
@@ -26,9 +26,9 @@ CREATE TABLE IF NOT EXISTS TVconnect(
 
 CREATE TABLE IF NOT EXISTS TVseasons(
 	id serial primary key,
-	showName varchar(128) not null,
+	show_name varchar(128) not null,
 	season_num integer,
-	releaseDate date,
+	release_date date,
 	about text,
 	photo varchar(128),
 	series_id integer,
@@ -37,9 +37,9 @@ CREATE TABLE IF NOT EXISTS TVseasons(
 
 CREATE TABLE IF NOT EXISTS episodes(
 	id serial primary key,
-	episodeName varchar(128) not null,
+	episode_name varchar(128) not null,
 	epi_num integer,
-	releaseDate date,
+	release_date date,
 	about text,
 	season integer,
 	series_id integer,

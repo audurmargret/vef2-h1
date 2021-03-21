@@ -33,9 +33,9 @@ export async function addSeries(data) {
     const q = `
         INSERT INTO 
           TVseries (
-            showName,
-            releaseDate,
-            stillGoing,
+            show_name,
+            release_date,
+            still_going,
             tagline,
             photo,
             about,
@@ -45,13 +45,13 @@ export async function addSeries(data) {
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `;
     try {
-        console.log(data.showName)
+        const imageUrl = imageUrlMap.get(data.photo);
         await query(q, [
-            data.showName,
-            data.releaseDate,
-            data.stillGoing,
+            data.show_name,
+            data.release_date,
+            data.still_going,
             data.tagline,
-            data.photo,
+            imageUrl,
             data.about,
             data.language,
             data.channel,
@@ -67,9 +67,9 @@ export async function addSeries(data) {
 export async function updateSeries(id, data) {
     const q = `
         UPDATE TVseries SET 
-          showName = $1,
-          releaseDate = $2,
-          stillGoing = $3,
+          show_name = $1,
+          release_date = $2,
+          still_going = $3,
           tagline = $4,
           photo = $5,
           about = $6,
@@ -80,9 +80,9 @@ export async function updateSeries(id, data) {
     `;
     try {
         await query(q, [
-            data.showName,
-            data.releaseDate,
-            data.stillGoing,
+            data.show_name,
+            data.release_date,
+            data.still_going,
             data.tagline,
             data.photo,
             data.about,

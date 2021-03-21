@@ -119,9 +119,9 @@ export async function createSeries(data){
         INSERT INTO 
           TVseries (
             id,
-            showName,
-            releaseDate,
-            stillGoing,
+            show_name,
+            release_date,
+            still_going,
             tagline,
             photo,
             about,
@@ -153,8 +153,8 @@ export async function createGenre(data){
     const q = `
         INSERT INTO
           TVgenre (
-            typeName)
-          VALUES ($1) ON CONFLICT (typeName)
+            type_name)
+          VALUES ($1) ON CONFLICT (type_name)
           DO NOTHING;
     `;
     const genres = data.genres.split(',');
@@ -171,7 +171,7 @@ export async function createGenre(data){
 
 async function getGenreId(genre){
     const q = `
-        SELECT id FROM TVgenre WHERE typeName = $1
+        SELECT id FROM TVgenre WHERE type_name = $1
     `;
     const value = [genre];
     const result = await query(q, value);
@@ -210,9 +210,9 @@ export async function createSeasons(data) {
     const q = `
         INSERT INTO
           TVseasons (
-            showName,
+            show_name,
             season_num,
-            releaseDate,
+            release_date,
             about,
             photo,
             series_id)
@@ -240,7 +240,7 @@ export async function createSeasons(data) {
 export async function createEpisodes(data){
     const q = `
         INSERT INTO
-          episodes (episodeName, epi_num, releaseDate, about, season, series_id)
+          episodes (episode_name, epi_num, release_date, about, season, series_id)
         VALUES ($1, $2, $3, $4, $5, $6)
     `;
     let date = data.airDate;

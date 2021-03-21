@@ -13,9 +13,9 @@ export async function allSeasons(seriesId) {
 }
 
 export async function addSeason(body) {
-    const q = `INSERT INTO TVseasons (showName, season_num, releaseDate, about, photo, series_id)
+    const q = `INSERT INTO TVseasons (show_name, season_num, release_date, about, photo, series_id)
                VALUES ($1,$2,$3,$4,$5,$6) RETURNING *;`;
-    const values = [body.showName, body.season_num, body.releaseDate, body.about, body.photo, body.series_id]
+    const values = [body.show_name, body.season_num, body.release_date, body.about, body.photo, body.series_id]
     try{
         await query(q, values);
         return true;
