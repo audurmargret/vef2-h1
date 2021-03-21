@@ -1,3 +1,7 @@
+import validator from 'express-validator';
+
+const { check } = validator;
+
 export const seriesSanitazions = [
     check('showName').trim().escape(),
     check('releaseDate').trim().escape(),
