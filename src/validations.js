@@ -53,7 +53,7 @@ export const seriesValidations = [
     .withMessage('stillGoing verður að vera true eða false'),
 
   check('url')
-    .optional().isUrl()
+    .optional().isURL()
     .withMessage('Ógildur linkur'),
 ];
 
