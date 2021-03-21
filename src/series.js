@@ -1,5 +1,16 @@
 import { query } from './db.js';
 
+export async function findAllSeries() {
+    const q = 'SELECT * FROM TVseries';
+    try {
+        const result = await query(q);
+        return result.rows;
+    } catch (e) {
+        console.error('Gat ekki sótt þáttaraðir', e);
+        return null;
+    }
+}
+
 export async function findSeries(id) {
     const q = `
         SELECT * FROM TVseries WHERE id = $1
@@ -34,26 +45,26 @@ export async function addSeries(data) {
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
     `;
     try {
+        console.log(data.showName)
         await query(q, [
-            data.name,
-            data.airDate,
-            data.inProduction,
+            data.showName,
+            data.releaseDate,
+            data.stillGoing,
             data.tagline,
-            data.image,
-            data.description,
+            data.photo,
+            data.about,
             data.language,
-            data.network,
-            data.homepage
+            data.channel,
+            data.url
         ]);
         return true;
     } catch(e) {
+        console.error('Gat ekki bætt við þáttaröð', e)
         return false;
     }
 }
 
 export async function updateSeries(id, data) {
-    console.log(data.showName)
-    console.log("id", id)
     const q = `
         UPDATE TVseries SET 
           showName = $1,

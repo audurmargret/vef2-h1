@@ -11,7 +11,8 @@ import {
     findSeries,
     addSeries,
     getStateAndRate,
-    getInfo
+    getInfo,
+    findAllSeries
 } from './series.js';
 import { 
     allSeasons, 
@@ -25,36 +26,38 @@ import { getGenres, addGenre, getInfoGenres } from './genres.js'
 import { Result } from 'express-validator';
 export const router = express.Router();
 
-router.get('/', (req, res) => {
-    res.json({color: 'Bleikur'})
+router.get('/', async (req, res) => {
+    const series = await findAllSeries();
+    if (series){
+        return res.json(series);
+    }
+    return res.status(500).json({error: 'Villa við að sækja seríur'})
 });
 
-router.post('/', requireAuthentication, checkUserIsAdmin, (req, res) => {
-    const success = addSeries(req.body);
+router.post('/', requireAuthentication, checkUserIsAdmin, async (req, res) => {
+    const success = await addSeries(req.body);
     if (success) {
-        res.json({ msg: 'Bætti við þáttaröð'});
-    } else {
-        res.status(500).json({ error: 'Villa við að bæta við þáttaröð'});
+        return res.json({ msg: 'Bætti við þáttaröð'});
     }
-})
+    return res.status(500).json({ error: 'Villa við að bæta við þáttaröð'});
+});
 
 router.get('/genres', async (req, res) => {
     const genres = await getGenres();
     if(genres) {
         return res.json(genres);
     }
-    else return res.status(500).json({error: 'Villa að sækja genres'})
-})
+    return res.status(500).json({error: 'Villa að sækja genres'})
+});
 
 router.post('/genres', requireAuthentication, checkUserIsAdmin, async (req, res) => {
     console.log(req.body.genre)
     const success = await addGenre(req.body.genre);
     if (success) {
-        res.json({ msg: 'Tókst að búa til tegund'});
-    } else {
-        res.status(500).json({ msg: 'Villa við að búa til tegund'});
+        return res.json({ msg: 'Tókst að búa til tegund'});
     }
-})
+    return res.status(500).json({ msg: 'Villa við að búa til tegund'});
+});
 
 router.get('/:seriesId', halfRequireAuthentication, async (req, res) => {
     const {
@@ -72,7 +75,6 @@ router.get('/:seriesId', halfRequireAuthentication, async (req, res) => {
         if(info.status){
             series = { ...series, userStatus: info.status};
         }
-
     }
 
     const avg = await getInfo(seriesId)
@@ -81,7 +83,7 @@ router.get('/:seriesId', halfRequireAuthentication, async (req, res) => {
     series = { ...series, averageRating: avg.avg, totalRatings: avg.counter, genres: genres, seasons}
 
     return res.json(series);
-})
+});
 
 router.patch('/:seriesId', requireAuthentication, checkUserIsAdmin, async (req, res) => {
     const {
@@ -89,11 +91,10 @@ router.patch('/:seriesId', requireAuthentication, checkUserIsAdmin, async (req, 
     } = req.params;
     const success = await updateSeries(seriesId, req.body);
     if (success) {
-        res.json({ msg: 'Uppfærði þáttaröð'});
-    } else {
-        res.status(500).json({ error: 'Villa við að uppfæra þáttaröð'});
+        return res.json({ msg: 'Uppfærði þáttaröð'});
     }
-})
+    return res.status(500).json({ error: 'Villa við að uppfæra þáttaröð'});
+});
 
 router.delete('/:seriesId', requireAuthentication, checkUserIsAdmin, async (req, res) => {
     const {
@@ -103,10 +104,9 @@ router.delete('/:seriesId', requireAuthentication, checkUserIsAdmin, async (req,
     console.log(success)
     if (success) {
         res.json({ msg: 'Eyddi þáttaröð'});
-    } else {
-        res.status(500).json({ error: 'Villa við að eyða þáttaröð'});
     }
-})
+    return res.status(500).json({ error: 'Villa við að eyða þáttaröð'});
+});
 
 router.post('/:seriesId/rate', requireAuthentication, (req, res) => {
     const {
@@ -114,11 +114,10 @@ router.post('/:seriesId/rate', requireAuthentication, (req, res) => {
     } = req.params;
     const success = rateSeries(seriesId, req.user.id, req.body.rate);
     if (success) {
-        res.json({ msg: 'Tókst að gefa einkunn'});
-    } else {
-        res.status(500).json({error: 'Villa við að gefa einkunn'});
+        return res.json({ msg: 'Tókst að gefa einkunn'});
     }
-})
+    return res.status(500).json({error: 'Villa við að gefa einkunn'});
+});
 
 router.patch('/:seriesId/rate', requireAuthentication, (req, res) => {
     const {
@@ -126,11 +125,10 @@ router.patch('/:seriesId/rate', requireAuthentication, (req, res) => {
     } = req.params;
     const success = updateSeriesRating(seriesId, req.user.id, req.body);
     if (success) {
-        res.json({msg: 'Tókst að uppfæra einkunn'});
-    } else {
-        res.status(500).json({error: 'Villa við að uppfæra einkunn'});
+        return res.json({msg: 'Tókst að uppfæra einkunn'});
     }
-})
+    return res.status(500).json({error: 'Villa við að uppfæra einkunn'});
+});
 
 router.delete('/:seriesId/rate', requireAuthentication, (req, res) => {
     const {
@@ -138,11 +136,10 @@ router.delete('/:seriesId/rate', requireAuthentication, (req, res) => {
     } = req.params;
     const success = deleteSeriesRating(seriesId, req.user.id);
     if (success) {
-        res.json({ msg: 'Tókst að eyða einkunn'});
-    } else {
-        res.status(500).json({error: 'Villa við að eyða einkunn'});
+        return res.json({ msg: 'Tókst að eyða einkunn'});
     }
-})
+    return res.status(500).json({error: 'Villa við að eyða einkunn'});
+});
 
 router.post('/:seriesId/state', requireAuthentication, async (req, res) => {
     const {
@@ -151,11 +148,10 @@ router.post('/:seriesId/state', requireAuthentication, async (req, res) => {
     console.log(req.body.state)
     const success = await stateSeries(seriesId, req.user.id, req.body.state );
     if (success) {
-        res.json({ msg: 'Tókst að setja stöðu'});
-    } else {
-        res.status(500).json({error: 'Villa við að setja stöðu'});
+        return res.json({ msg: 'Tókst að setja stöðu'});
     }
-})
+    return res.status(500).json({error: 'Villa við að setja stöðu'});
+});
 
 router.patch('/:seriesId/state', requireAuthentication, (req, res) => {
     const {
@@ -163,11 +159,11 @@ router.patch('/:seriesId/state', requireAuthentication, (req, res) => {
     } = req.params;
     const success = updateSeriesState(seriesId);
     if (success) {
-        res.json({ msg: 'Tókst að uppfæra stöðu'});
-    } else {
-        res.status(500).json({ error: 'Villa við að uppfæra stöðu'});
+        return res.json({ msg: 'Tókst að uppfæra stöðu'});
     }
-})
+    return res.status(500).json({ error: 'Villa við að uppfæra stöðu'});
+
+});
 
 router.delete('/:seriesId/state', requireAuthentication, (req, res) => {
     const {
@@ -175,11 +171,10 @@ router.delete('/:seriesId/state', requireAuthentication, (req, res) => {
     } = req.params;
     const success = deleteSeriesState(seriesId);
     if (success) {
-        res.json({ msg: 'Tókst að eyða stöðu'});
-    } else {
-        res.status(500).json({ error: 'Villa við að eyða stöðu'});
+        return res.json({ msg: 'Tókst að eyða stöðu'});
     }
-})
+    return res.status(500).json({ error: 'Villa við að eyða stöðu'});
+});
 
 router.get('/:seriesId/season', async (req, res) => {
     const {
@@ -190,7 +185,7 @@ router.get('/:seriesId/season', async (req, res) => {
         return res.status(404).json({error: 'Sería fannst ekki'})
     }
     return res.json(seasons);
-})
+});
 
 router.post('/:seriesId/season', requireAuthentication, checkUserIsAdmin, async (req, res) => {
     const success = await addSeason(req.body);
@@ -198,7 +193,7 @@ router.post('/:seriesId/season', requireAuthentication, checkUserIsAdmin, async 
         return res.json({msg: 'Seríu bætt við'});
     }
     return res.json({error: 'Ekki tókst að bæta seríu við'});
-})
+});
 
 router.get('/:seriesId/season/:seasonId', async (req, res) => {
     const {
@@ -210,7 +205,7 @@ router.get('/:seriesId/season/:seasonId', async (req, res) => {
         return res.json(season);
     }
     return res.status(404).json({error: 'Fann ekki seríu'});
-})
+});
 
 router.delete('/:seriesId/season/:seasonId', requireAuthentication, checkUserIsAdmin, (req, res) => {
     const {
@@ -222,7 +217,7 @@ router.delete('/:seriesId/season/:seasonId', requireAuthentication, checkUserIsA
         return res.json({msg: 'Seríu eytt'});
     }
     return res.json({error: 'Gat ekki eytt seríu'});
-})
+});
 
 router.post('/:seriesId/season/:seasonId/episode', requireAuthentication, checkUserIsAdmin, async (req, res) => {
     const {
@@ -231,11 +226,10 @@ router.post('/:seriesId/season/:seasonId/episode', requireAuthentication, checkU
     } = req.params;
     const success = await addEpisode(seriesId, seasonId, req.body);
     if (success) {
-        res.json({ msg: 'Bætti við þætti'});
-    } else {
-        res.status(500).json({ error: 'Villa við að bæta við þætti'});
+        return res.json({ msg: 'Bætti við þætti'});
     }
-})
+    return res.status(500).json({ error: 'Villa við að bæta við þætti'});
+});
 
 router.get('/:seriesId/season/:seasonId/episode/:episodeId', async (req, res) => {
     const {
@@ -248,7 +242,7 @@ router.get('/:seriesId/season/:seasonId/episode/:episodeId', async (req, res) =>
         return res.status(404).json({error: 'Þáttur ekki til'});
     }
     return res.json(episode);
-})
+});
 
 router.delete('/:seriesId/season/:seasonId/episode/:episodeId', requireAuthentication, checkUserIsAdmin, (req, res) => {
     const {
@@ -258,9 +252,8 @@ router.delete('/:seriesId/season/:seasonId/episode/:episodeId', requireAuthentic
     } = req.params;
     const success = deleteEpisode(seriesId, seasonId, episodeId);
     if (success) {
-        res.json({ msg: 'Eyddi þætti'});
-    } else {
-        res.status(500).json({ error: 'Villa við að eyða þætti'});
+        return res.json({ msg: 'Eyddi þætti'});
     }
-})
+    return res.status(500).json({ error: 'Villa við að eyða þætti'});
+});
 
